@@ -1,0 +1,10 @@
+com\carmotors\model\EstadoLote.class
+com\carmotors\run\ProyectoJAVA_CarMotors_AndersonAndresAda.class
+com\carmotors\model\Lote.class
+com\carmotors\util\Conexion.class
+com\carmotors\controller\prueba.class
+com\carmotors\controller\RepuestoController.class
+com\carmotors\model\Repuesto.class
+com\carmotors\view\VentanaPrincipal.class
+com\carmotors\model\Proveedor.class
+com\carmotors\modelDAO\RepuestoDAO.class
