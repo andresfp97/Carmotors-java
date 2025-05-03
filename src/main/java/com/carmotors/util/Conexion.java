@@ -20,7 +20,7 @@ public class Conexion {
     private String dbName = "carmotors";
     private String driver = "com.mysql.cj.jdbc.Driver";  // ✅ Usa el driver moderno
     private String userName = "root";
-    private String password = "root";
+    private String password = "";
 
     public Conexion() {
         try {

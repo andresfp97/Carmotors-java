@@ -9,6 +9,7 @@ import org.jdatepicker.impl.JDatePickerImpl;
 
 import org.jdatepicker.impl.UtilDateModel;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -27,7 +28,7 @@ public class PanelRepuesto extends JPanel {
             txtCatidadInicial, txtCatidadDisponible;
     private JButton btnGuardar, btnGuardarLote;
     private JComboBox<String> txtEstado, txtTipo;
-    private JDatePickerImpl datePicker;
+    private JDatePickerImpl datePickerVidaUtil, datePickerFechaIngreso;
 
     public PanelRepuesto() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -65,10 +66,10 @@ public class PanelRepuesto extends JPanel {
         p.put("text.year", "Año");
 
         JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        datePickerVidaUtil = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         JPanel datePanelWrapper = new JPanel(new BorderLayout());
         datePanelWrapper.setBackground(Color.WHITE);
-        datePanelWrapper.add(datePicker, BorderLayout.WEST);
+        datePanelWrapper.add(datePickerVidaUtil, BorderLayout.WEST);
         addFormRow(formSuperior, gbc, 4, "Vida Útil Estimada:", datePanelWrapper);
 
         panelSuperior.add(formSuperior);
@@ -104,10 +105,10 @@ public class PanelRepuesto extends JPanel {
         p2.put("text.year", "Año");
 
         JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p2);
-        datePicker = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
+        datePickerFechaIngreso = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
         JPanel datePanelWrapper2 = new JPanel(new BorderLayout());
         datePanelWrapper2.setBackground(Color.WHITE);
-        datePanelWrapper2.add(datePicker, BorderLayout.WEST);
+        datePanelWrapper2.add(datePickerFechaIngreso, BorderLayout.WEST);
 
         addFormRow(formInferior, gbc, 2, "Fecha Ingreso:", datePanelWrapper2);
         addFormRow(formInferior, gbc, 3, "Cantidad Inicial:", txtCatidadInicial = createStyledTextField(15));
@@ -245,13 +246,14 @@ public class PanelRepuesto extends JPanel {
         r.setMarca(txtMarca.getText());
         r.setModeloCompatible(txtModelo.getText());
 
-        // Manejo seguro de la fecha
-        if (datePicker.getModel().isSelected()) {
-            Calendar cal = Calendar.getInstance();
-            cal.set(datePicker.getModel().getYear(),
-                    datePicker.getModel().getMonth(),
-                    datePicker.getModel().getDay());
-            r.setVidaUtilEstimada(cal.getTime());
+        // Usa datePickerVidaUtil en lugar de datePicker
+        if (datePickerVidaUtil.getModel().isSelected()) {
+            LocalDate localDate = LocalDate.of(
+                    datePickerVidaUtil.getModel().getYear(),
+                    datePickerVidaUtil.getModel().getMonth() + 1,
+                    datePickerVidaUtil.getModel().getDay()
+            );
+            r.setVidaUtilEstimada(java.sql.Date.valueOf(localDate));
         } else {
             r.setVidaUtilEstimada(null);
         }
@@ -264,11 +266,11 @@ public class PanelRepuesto extends JPanel {
         r.setIdrepuesto(Integer.valueOf(txtIdRepuesto.getText()));
         r.setIdproveedor(Integer.valueOf(txtIdProveedor.getText()));
 
-        if (datePicker.getModel().isSelected()) {
+        if (datePickerFechaIngreso.getModel().isSelected()) {
             Calendar cal = Calendar.getInstance();
-            cal.set(datePicker.getModel().getYear(),
-                    datePicker.getModel().getMonth(),
-                    datePicker.getModel().getDay());
+            cal.set(datePickerFechaIngreso.getModel().getYear(),
+                    datePickerFechaIngreso.getModel().getMonth(),
+                    datePickerFechaIngreso.getModel().getDay());
             r.setFechaIngreso(cal.getTime());
         } else {
             r.setFechaIngreso(null);
@@ -292,9 +294,14 @@ public class PanelRepuesto extends JPanel {
         txtModelo.setText("");
 
         // Limpiar el datePicker correctamente
-        datePicker.getModel().setValue(null);
-        datePicker.getModel().setSelected(false);
-        datePicker.getJFormattedTextField().setText("");
+        datePickerVidaUtil.getModel().setValue(null);
+        datePickerVidaUtil.getModel().setSelected(false);
+        datePickerVidaUtil.getJFormattedTextField().setText("");
+
+
+        datePickerFechaIngreso.getModel().setValue(null);
+        datePickerFechaIngreso.getModel().setSelected(false);
+        datePickerFechaIngreso.getJFormattedTextField().setText("");
 
         // Limpiar formulario inferior
         txtIdRepuesto.setText("");
@@ -322,14 +329,14 @@ public class PanelRepuesto extends JPanel {
         if (repuesto.getVidaUtilEstimada() != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(repuesto.getVidaUtilEstimada());
-            datePicker.getModel().setDate(
+            datePickerVidaUtil.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)
             );
-            datePicker.getModel().setSelected(true);
+            datePickerVidaUtil.getModel().setSelected(true);
         } else {
-            datePicker.getModel().setValue(null);
+            datePickerVidaUtil.getModel().setValue(null);
         }
     }
 
@@ -340,14 +347,14 @@ public class PanelRepuesto extends JPanel {
         if (lote.getFechaIngreso() != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(lote.getFechaIngreso());
-            datePicker.getModel().setDate(
+            datePickerFechaIngreso.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)
             );
-            datePicker.getModel().setSelected(true);
+            datePickerFechaIngreso.getModel().setSelected(true);
         } else {
-            datePicker.getModel().setValue(null);
+            datePickerFechaIngreso.getModel().setValue(null);
         }
 
         txtCatidadInicial.setText(String.valueOf(lote.getCantidadInicial()));
