@@ -145,4 +145,20 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         }
         return vehiculos;
     }
+
+    public boolean existePlaca(String placa) {
+        String sql = "SELECT COUNT(*) FROM vehiculo WHERE placa = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, placa);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Retorna true si encuentra alguna coincidencia
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar placa: " + e.getMessage());
+        }
+        return false;
+    }
 }

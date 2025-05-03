@@ -13,14 +13,8 @@ package com.carmotors.view;
 import javax.swing.*;
 import java.awt.*;
 
-import com.carmotors.controller.ClienteController;
-import com.carmotors.controller.LoteController;
-import com.carmotors.controller.RepuestoController;
-import com.carmotors.controller.ProveedorController;
-import com.carmotors.modelDAO.ClienteDAO;
-import com.carmotors.modelDAO.LoteDAO;
-import com.carmotors.modelDAO.ProveedorDAO;
-import com.carmotors.modelDAO.RepuestoDAO;
+import com.carmotors.controller.*;
+import com.carmotors.modelDAO.*;
 
 public class VentanaPrincipal extends JFrame {
     private JPanel panelDerecho;
@@ -29,9 +23,12 @@ public class VentanaPrincipal extends JFrame {
     private PanelRepuesto panelRepuesto;
     private PanelProveedor panelProveedor;
     private PanelCliente panelCliente;
+
+    private PanelVehiculo panelVehiculo;
     private final int MIN_MENU_WIDTH = 250;
 
-    public VentanaPrincipal(RepuestoDAO repuestoDAO, ProveedorDAO proveedorDAO, ClienteDAO clienteDAO, LoteDAO loteDAO) {
+
+    public VentanaPrincipal(RepuestoDAO repuestoDAO, ProveedorDAO proveedorDAO, ClienteDAO clienteDAO, LoteDAO loteDAO, VehiculoDAO vehiculoDAO) {
         setTitle("Sistema de Gestión de Repuestos y Proveedores");
         setSize(1200, 700);
         setMinimumSize(new Dimension(800, 500));
@@ -39,7 +36,7 @@ public class VentanaPrincipal extends JFrame {
         setLayout(new BorderLayout());
 
         initComponents();
-        initControllers(repuestoDAO, proveedorDAO, clienteDAO, loteDAO);
+        initControllers(repuestoDAO, proveedorDAO, clienteDAO, loteDAO, vehiculoDAO);
     }
 
     private void initComponents() {
@@ -54,6 +51,7 @@ public class VentanaPrincipal extends JFrame {
         panelRepuesto = new PanelRepuesto();
         panelProveedor = new PanelProveedor();
         panelCliente = new PanelCliente();
+        panelVehiculo = new PanelVehiculo();
 
         panelDerecho.add(panelRepuesto, "Repuestos");
         panelDerecho.add(panelProveedor, "Proveedores");
@@ -67,17 +65,19 @@ public class VentanaPrincipal extends JFrame {
         crearBotonesMenu();
     }
 
-    private void initControllers(RepuestoDAO repuestoDao, ProveedorDAO proveedorDao, ClienteDAO clienteDao, LoteDAO loteDao) {
+    private void initControllers(RepuestoDAO repuestoDao, ProveedorDAO proveedorDao, ClienteDAO clienteDao, LoteDAO loteDao,VehiculoDAO vehiculoDAO) {
         new RepuestoController(panelRepuesto, repuestoDao);
         new ProveedorController(panelProveedor, proveedorDao);
         new ClienteController(panelCliente, clienteDao );
         new LoteController(panelRepuesto, loteDao);
+        new VehiculoController(panelVehiculo,vehiculoDAO,clienteDao);
     }
 
     private void crearBotonesMenu() {
         JButton btnRepuestos = new JButton("Gestion de Inventario");
         JButton btnProveedores = new JButton("Proveedores y Compras");
         JButton btnClientes = new JButton("Clientes y Facturacion");
+        JButton btnVehiculo = new JButton("gestion vehiculo");
 
         btnRepuestos.setForeground(Color.WHITE);
         btnProveedores.setForeground(Color.WHITE);
