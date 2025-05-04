@@ -2,6 +2,7 @@ package com.carmotors.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -9,15 +10,16 @@ public class Conexion {
     private static Conexion instance;
     private HikariDataSource dataSource;
 
-    private Conexion() {
+    public Conexion() {
+
         try {
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
             config.setUsername("root");
-            config.setPassword("");
+            config.setPassword("root");
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(5);
-            config.setConnectionTimeout(30000);
+            config.setConnectionTimeout(60000);
             config.addDataSourceProperty("cachePrepStmts", "true");
             config.addDataSourceProperty("prepStmtCacheSize", "250");
             config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

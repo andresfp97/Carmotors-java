@@ -1,5 +1,6 @@
 package com.carmotors.run;
 
+
 import com.carmotors.model.Cliente;
 import com.carmotors.modelDAO.*;
 import com.carmotors.view.VentanaPrincipal;
@@ -13,9 +14,12 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
             RepuestoDAO repuestoDAO = new RepuestoDAO();
             ProveedorDAO proveedorDAO = new ProveedorDAO();
             ClienteDAO clienteDAO = new ClienteDAO();
+            ActividadEspecialDAO aedao = new ActividadEspecialDAO();
+            ClienteActividadDAO cadao = new ClienteActividadDAO();
 
             LoteDAO loteDAO = new LoteDAO();
             VehiculoDAO vehiculoDAO = new VehiculoDAO();
+
 
             ServicioDAO servicioDAO = new ServicioDAO();
             TrabajoDAO trabajoDAO = new TrabajoDAO();
@@ -40,7 +44,9 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
                     null ,
                     servicioDAO,
                     trabajoDAO,
-                    detalleTrabajoDAO
+                    detalleTrabajoDAO,
+                    aedao,
+                    cadao
                     // Temporalmente null, lo seteamos después
             );
 
@@ -59,6 +65,7 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
 
             // Asignar el callback a la ventana y controladores
             vista.setActualizarCallback(actualizarCallback);
+
 
             vista.setVisible(true);
         });

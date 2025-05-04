@@ -361,4 +361,5 @@ public class PanelRepuesto extends JPanel {
         txtCatidadDisponible.setText(String.valueOf(lote.getCantidadDisponible()));
         txtEstado.setSelectedItem(lote.getEstado().toString().toLowerCase().replace("_", " "));
     }
+
 }
