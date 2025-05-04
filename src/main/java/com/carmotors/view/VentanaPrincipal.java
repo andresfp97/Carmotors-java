@@ -117,11 +117,7 @@ public class VentanaPrincipal extends JFrame {
         new TrabajoController(panelTrabajo, trabajoDAO, vehiculoDAO, servicioDAO);
 
         // Nuevo controlador para el panel de detalles
-<<<<<<< HEAD
         new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO, loteDao, trabajoDAO);
-=======
-        new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO,loteDao);
->>>>>>> c3141bc73b24ef9c4f63fd96acf04ccacb3a4abc
         new ActividadEspecialController(panelActividadEspecial, actividadEspecialDAO);
         new ClienteActividadController(panelClienteActividad, clienteActividadDAO);
     }

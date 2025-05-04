@@ -16,7 +16,7 @@ public class Conexion {
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
             config.setUsername("root");
-            config.setPassword("root");
+            config.setPassword("");
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(5);
             config.setConnectionTimeout(60000);
