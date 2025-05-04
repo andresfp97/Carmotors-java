@@ -2,20 +2,20 @@ package com.carmotors.model;
 
 public class DetalleTrabajoRepuesto {
     private Integer idDetalle;
-    private Integer idTrabajo;
-    private Integer idLote;
+    private Trabajo trabajo;  // Objeto Trabajo en lugar de solo ID
+    private Lote lote;       // Objeto Lote en lugar de solo ID
     private Integer cantidadUsada;
 
     public DetalleTrabajoRepuesto() {
     }
 
-    public DetalleTrabajoRepuesto(Integer idDetalle, Integer idLote, Integer idTrabajo, Integer cantidadUsada) {
-        this.idDetalle = idDetalle;
-        this.idLote = idLote;
-        this.idTrabajo = idTrabajo;
+    public DetalleTrabajoRepuesto(Trabajo trabajo, Lote lote, Integer cantidadUsada) {
+        this.trabajo = trabajo;
+        this.lote = lote;
         this.cantidadUsada = cantidadUsada;
     }
 
+    // Getters y Setters
     public Integer getIdDetalle() {
         return idDetalle;
     }
@@ -24,12 +24,20 @@ public class DetalleTrabajoRepuesto {
         this.idDetalle = idDetalle;
     }
 
-    public Integer getIdTrabajo() {
-        return idTrabajo;
+    public Trabajo getTrabajo() {
+        return trabajo;
     }
 
-    public void setIdTrabajo(Integer idTrabajo) {
-        this.idTrabajo = idTrabajo;
+    public void setTrabajo(Trabajo trabajo) {
+        this.trabajo = trabajo;
+    }
+
+    public Lote getLote() {
+        return lote;
+    }
+
+    public void setLote(Lote lote) {
+        this.lote = lote;
     }
 
     public Integer getCantidadUsada() {
@@ -40,11 +48,13 @@ public class DetalleTrabajoRepuesto {
         this.cantidadUsada = cantidadUsada;
     }
 
-    public Integer getIdLote() {
-        return idLote;
-    }
-
-    public void setIdLote(Integer idLote) {
-        this.idLote = idLote;
+    @Override
+    public String toString() {
+        return "DetalleTrabajoRepuesto{" +
+                "idDetalle=" + idDetalle +
+                ", trabajo=" + trabajo.getIdTrabajo() +
+                ", lote=" + lote.getId() +
+                ", cantidadUsada=" + cantidadUsada +
+                '}';
     }
 }

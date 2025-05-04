@@ -1,60 +1,69 @@
 package com.carmotors.model;
 
-import java.sql.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 public class Trabajo {
-    private Integer idTrabajo;
-    private Integer idVehiculo;
-    private Integer idServicio;
-    private Date fechaRecepcion;
-    private Date fechaEntrega;
+    private int idTrabajo;
+    private int idVehiculo;
+    private int idServicio;
+    private LocalDate fechaRecepcion;
+    private LocalDate fechaEntrega;
     private String tecnicoAsignado;
-    private List<DetalleTrabajoRepuesto> repuestosUtilizados;
 
-    // Constructor, getters y setters
-
-
-    public Trabajo() {
+    // Constructor
+    public Trabajo(int idTrabajo, int idVehiculo, int idServicio,
+                   LocalDate fechaRecepcion, LocalDate fechaEntrega,
+                   String tecnicoAsignado) {
+        this.idTrabajo = idTrabajo;
+        this.idVehiculo = idVehiculo;
+        this.idServicio = idServicio;
+        this.fechaRecepcion = fechaRecepcion;
+        this.fechaEntrega = fechaEntrega;
+        this.tecnicoAsignado = tecnicoAsignado;
     }
 
-    public Integer getIdTrabajo() {
+    public Trabajo() {
+
+    }
+
+    // Getters y Setters
+    public int getIdTrabajo() {
         return idTrabajo;
     }
 
-    public void setIdTrabajo(Integer idTrabajo) {
+    public void setIdTrabajo(int idTrabajo) {
         this.idTrabajo = idTrabajo;
     }
 
-    public Integer getIdVehiculo() {
+    public int getIdVehiculo() {
         return idVehiculo;
     }
 
-    public void setIdVehiculo(Integer idVehiculo) {
+    public void setIdVehiculo(int idVehiculo) {
         this.idVehiculo = idVehiculo;
     }
 
-    public Integer getIdServicio() {
+    public int getIdServicio() {
         return idServicio;
     }
 
-    public void setIdServicio(Integer idServicio) {
+    public void setIdServicio(int idServicio) {
         this.idServicio = idServicio;
     }
 
-    public Date getFechaRecepcion() {
+    public LocalDate getFechaRecepcion() {
         return fechaRecepcion;
     }
 
-    public void setFechaRecepcion(Date fechaRecepcion) {
+    public void setFechaRecepcion(LocalDate fechaRecepcion) {
         this.fechaRecepcion = fechaRecepcion;
     }
 
-    public Date getFechaEntrega() {
+    public LocalDate getFechaEntrega() {
         return fechaEntrega;
     }
 
-    public void setFechaEntrega(Date fechaEntrega) {
+    public void setFechaEntrega(LocalDate fechaEntrega) {
         this.fechaEntrega = fechaEntrega;
     }
 
@@ -66,14 +75,6 @@ public class Trabajo {
         this.tecnicoAsignado = tecnicoAsignado;
     }
 
-    public List<DetalleTrabajoRepuesto> getRepuestosUtilizados() {
-        return repuestosUtilizados;
-    }
-
-    public void setRepuestosUtilizados(List<DetalleTrabajoRepuesto> repuestosUtilizados) {
-        this.repuestosUtilizados = repuestosUtilizados;
-    }
-
     @Override
     public String toString() {
         return "Trabajo{" +
@@ -83,7 +84,6 @@ public class Trabajo {
                 ", fechaRecepcion=" + fechaRecepcion +
                 ", fechaEntrega=" + fechaEntrega +
                 ", tecnicoAsignado='" + tecnicoAsignado + '\'' +
-                ", repuestosUtilizados=" + repuestosUtilizados +
                 '}';
     }
 }

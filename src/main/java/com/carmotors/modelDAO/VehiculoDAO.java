@@ -161,4 +161,19 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         }
         return false;
     }
+
+    public boolean existeVehiculo(int idVehiculo) {
+        String sql = "SELECT id_vehiculo FROM vehiculo WHERE id_vehiculo = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, idVehiculo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); // Retorna true si existe, false si no
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

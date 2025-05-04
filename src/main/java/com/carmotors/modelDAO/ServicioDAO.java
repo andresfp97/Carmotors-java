@@ -1,78 +1,99 @@
 package com.carmotors.modelDAO;
 
-import com.carmotors.model.Servicios;
+import com.carmotors.model.Servicio;
+import com.carmotors.model.enums.EstadoServicio;
+import com.carmotors.model.enums.TipoMantenimiento;
 import com.carmotors.util.Conexion;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServicioDAO implements CrudDAO<Servicios> {
+public class ServicioDAO {
     private Connection con;
 
     public ServicioDAO() {
         con = Conexion.getConexion().getConnection();
     }
 
-    @Override
-    public boolean agregar(Servicios servicio) {
+    public boolean agregar(Servicio servicio) {
         String sql = "INSERT INTO servicio (tipo_mantenimiento, descripcion, costo_mano_obra, estado_servicio, tiempo_estimado) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, servicio.getTipoMantenimiento().name());
-            pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setDouble(3, servicio.getCostoManoObra());
-            pstmt.setString(4, servicio.getEstado().name());
-            pstmt.setInt(5, servicio.getTiempoEstimado());
+        try (Connection con = Conexion.getConexion().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
 
-            int affectedRows = pstmt.executeUpdate();
+            // Los índices deben ser secuenciales y coincidir con los parámetros en la consulta SQL
+            pstmt.setString(1, servicio.getTipoMantenimiento().name());  // Primer parámetro (tipo_mantenimiento)
+            pstmt.setString(2, servicio.getDescripcion());               // Segundo parámetro (descripcion)
+            pstmt.setDouble(3, servicio.getCostoManoObra());             // Tercer parámetro (costo_mano_obra)
+            pstmt.setString(4, servicio.getEstadoServicio().name());      // Cuarto parámetro (estado_servicio)
+            pstmt.setInt(5, servicio.getTiempoEstimadoMinutos());        // Quinto parámetro (tiempo_estimado)
 
-            if (affectedRows > 0) {
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        servicio.setId(rs.getInt(1));
-                    }
-                }
-                return true;
-            }
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al agregar servicio: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
-
-    public boolean actualizar(Servicios servicio) {
-        String sql = "UPDATE servicio SET tipo_mantenimiento = ?, descripcion = ?, costo_mano_obra = ?, estado_servicio = ?, tiempo_estimado = ? WHERE id_servicio = ?";
+    public Servicio obtenerPorId(int idServicio) {
+        String sql = "SELECT id_servicio, tipo_mantenimiento, descripcion, costo_mano_obra, estado_servicio, tiempo_estimado FROM servicio WHERE id_servicio = ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setString(1, servicio.getTipoMantenimiento().name());
-            pstmt.setString(2, servicio.getDescripcion());
-            pstmt.setDouble(3, servicio.getCostoManoObra());
-            pstmt.setString(4, servicio.getEstado().name());
-            pstmt.setInt(5, servicio.getTiempoEstimado());
-            pstmt.setInt(6, servicio.getId());
+            pstmt.setInt(1, idServicio);
 
-            return pstmt.executeUpdate() > 0;
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Servicio(
+                            rs.getInt("id_servicio"),
+                            TipoMantenimiento.fromString(rs.getString("tipo_mantenimiento")),
+                            rs.getString("descripcion"),
+                            rs.getDouble("costo_mano_obra"),
+                            EstadoServicio.fromString(rs.getString("estado_servicio")), // Conversión
+                            rs.getInt("tiempo_estimado")
+                    );
+                }
+            }
         } catch (SQLException e) {
-            System.err.println("Error al actualizar servicio: " + e.getMessage());
+            e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
+    public List<Servicio> obtenerTodos() {
+        List<Servicio> servicios = new ArrayList<>();
+        String sql = "SELECT id_servicio, tipo_mantenimiento, descripcion, costo_mano_obra, estado_servicio, tiempo_estimado FROM servicio";
 
-    public boolean eliminar(Integer id) {
-        String sql = "DELETE FROM servicio WHERE id_servicio = ?";
+        try (Connection con = Conexion.getConexion().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            return pstmt.executeUpdate() > 0;
+            while (rs.next()) {
+                try {
+                    Servicio servicio = new Servicio(
+                            rs.getInt("id_servicio"),
+                            TipoMantenimiento.fromString(rs.getString("tipo_mantenimiento")),
+                            rs.getString("descripcion"),
+                            rs.getDouble("costo_mano_obra"),
+                            EstadoServicio.fromString(rs.getString("estado_servicio")),
+                            rs.getInt("tiempo_estimado")
+                    );
+                    servicios.add(servicio);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Error al mapear servicio: " + e.getMessage());
+                    // Opcional: continuar con el siguiente registro
+                    continue;
+                }
+            }
+
         } catch (SQLException e) {
-            System.err.println("Error al eliminar servicio: " + e.getMessage());
+            System.err.println("Error al obtener servicios: " + e.getMessage());
+            e.printStackTrace();
+            // Opcional: puedes lanzar una excepción personalizada aquí
+            // throw new DataAccessException("Error al obtener servicios", e);
         }
-        return false;
+
+        return servicios;
     }
-
-
-
 }
