@@ -1,56 +1,52 @@
 package com.carmotors.util;
 
-/**
- *
- * @author ANDRES
- */
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import java.sql.*;
-
 public class Conexion {
+    private static Conexion instance;
+    private HikariDataSource dataSource;
 
-    private Connection con = null;
-    private static Conexion db;
-    private Statement statement;
-
-    private String url = "jdbc:mysql://localhost:3306/";
-    private String dbName = "carmotors";
-    private String driver = "com.mysql.cj.jdbc.Driver";  // ✅ Usa el driver moderno
-    private String userName = "root";
-    private String password = "";
-
-    public Conexion() {
+    private Conexion() {
         try {
-            Class.forName(driver);
-            con = DriverManager.getConnection(url + dbName, userName, password);
-            System.out.println("✅ Conexión exitosa.");
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
+            config.setUsername("root");
+            config.setPassword("");
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(5);
+            config.setConnectionTimeout(30000);
+            config.addDataSourceProperty("cachePrepStmts", "true");
+            config.addDataSourceProperty("prepStmtCacheSize", "250");
+            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+            dataSource = new HikariDataSource(config);
+            System.out.println("✅ Pool de conexiones HikariCP inicializado correctamente");
         } catch (Exception e) {
+            System.err.println("❌ Error al inicializar pool de conexiones");
             e.printStackTrace();
+            throw new RuntimeException("Error al inicializar pool de conexiones", e);
         }
     }
 
-    public static Conexion getConexion() {
-        if (db == null) {
-            db = new Conexion();
+    public static synchronized Conexion getConexion() {
+        if (instance == null) {
+            instance = new Conexion();
         }
-        return db;
+        return instance;
     }
 
     public Connection getConnection() {
-        return this.con;
-    }
-
-    public void cerrarConexion() {
         try {
-            if (con != null && !con.isClosed()) {
-                con.close();
-                System.out.println("🔒 Conexión cerrada.");
-            }
+            Connection conn = dataSource.getConnection();
+            System.out.println("🔹 Conexión obtenida del pool");
+            return conn;
         } catch (SQLException e) {
+            System.err.println("❌ Error al obtener conexión del pool");
             e.printStackTrace();
+            throw new RuntimeException("Error al obtener conexión", e);
         }
     }
 }
