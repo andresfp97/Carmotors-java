@@ -1,22 +1,23 @@
 package com.carmotors.model;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Trabajo {
     private int idTrabajo;
-    private int idVehiculo;
-    private int idServicio;
+    private Vehiculo vehiculo;
+    private Servicio servicio;
     private LocalDate fechaRecepcion;
     private LocalDate fechaEntrega;
     private String tecnicoAsignado;
 
     // Constructor
-    public Trabajo(int idTrabajo, int idVehiculo, int idServicio,
+    public Trabajo(int idTrabajo, Vehiculo vehiculo, Servicio servicio,
                    LocalDate fechaRecepcion, LocalDate fechaEntrega,
                    String tecnicoAsignado) {
         this.idTrabajo = idTrabajo;
-        this.idVehiculo = idVehiculo;
-        this.idServicio = idServicio;
+        this.vehiculo = vehiculo;
+        this.servicio = servicio;
         this.fechaRecepcion = fechaRecepcion;
         this.fechaEntrega = fechaEntrega;
         this.tecnicoAsignado = tecnicoAsignado;
@@ -35,20 +36,20 @@ public class Trabajo {
         this.idTrabajo = idTrabajo;
     }
 
-    public int getIdVehiculo() {
-        return idVehiculo;
+    public Vehiculo getVehiculo() {
+        return vehiculo;
     }
 
-    public void setIdVehiculo(int idVehiculo) {
-        this.idVehiculo = idVehiculo;
+    public void setVehiculo(Vehiculo vehiculo) {
+        this.vehiculo = vehiculo;
     }
 
-    public int getIdServicio() {
-        return idServicio;
+    public Servicio getServicio() {
+        return servicio;
     }
 
-    public void setIdServicio(int idServicio) {
-        this.idServicio = idServicio;
+    public void setServicio(Servicio servicio) {
+        this.servicio = servicio;
     }
 
     public LocalDate getFechaRecepcion() {
@@ -77,13 +78,9 @@ public class Trabajo {
 
     @Override
     public String toString() {
-        return "Trabajo{" +
-                "idTrabajo=" + idTrabajo +
-                ", idVehiculo=" + idVehiculo +
-                ", idServicio=" + idServicio +
-                ", fechaRecepcion=" + fechaRecepcion +
-                ", fechaEntrega=" + fechaEntrega +
-                ", tecnicoAsignado='" + tecnicoAsignado + '\'' +
-                '}';
+        String fecha = fechaRecepcion != null ? 
+                      fechaRecepcion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : 
+                      "Sin fecha";
+        return "Trabajo #" + idTrabajo + " - " + fecha;
     }
 }

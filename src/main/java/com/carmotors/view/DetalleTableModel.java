@@ -2,6 +2,8 @@ package com.carmotors.view;
 
 import com.carmotors.model.DetalleTrabajoRepuesto;
 import javax.swing.table.AbstractTableModel;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetalleTableModel extends AbstractTableModel {
@@ -9,7 +11,7 @@ public class DetalleTableModel extends AbstractTableModel {
     private final String[] columnNames = {"ID", "Repuesto", "Lote", "Cantidad"};
 
     public DetalleTableModel(List<DetalleTrabajoRepuesto> detalles) {
-        this.detalles = detalles;
+        this.detalles = detalles != null ? detalles : new ArrayList<>();
     }
 
     @Override
@@ -42,4 +44,5 @@ public class DetalleTableModel extends AbstractTableModel {
     public DetalleTrabajoRepuesto getDetalleAt(int row) {
         return detalles.get(row);
     }
+
 }

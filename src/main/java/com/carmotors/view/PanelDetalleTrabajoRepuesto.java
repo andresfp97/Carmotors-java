@@ -1,6 +1,7 @@
 package com.carmotors.view;
 
 import com.carmotors.model.Lote;
+import com.carmotors.model.Trabajo;
 import com.carmotors.model.DetalleTrabajoRepuesto;
 import javax.swing.*;
 import java.awt.*;
@@ -8,8 +9,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class PanelDetalleTrabajoRepuesto extends JPanel {
-    private JLabel lblTrabajoId;
-    private JComboBox<Lote> cbLotes;
+    private JComboBox<TrabajoCombo> cbTrabajos;
+    private JComboBox<LoteCombo> cbLotes;
     private JTextField txtCantidad;
     private JLabel lblStock;
     private JButton btnGuardar;
@@ -20,11 +21,11 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     private JButton btnBuscarLote;
 
     public PanelDetalleTrabajoRepuesto() {
+        setLayout(new BorderLayout());
         initComponents();
     }
 
     private void initComponents() {
-        setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Panel superior (formulario)
@@ -32,45 +33,67 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         panelFormulario.setLayout(new BoxLayout(panelFormulario, BoxLayout.Y_AXIS));
         panelFormulario.setBorder(BorderFactory.createTitledBorder("Registro de Repuestos"));
 
-        // Panel de información del trabajo
-        JPanel panelTrabajo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblTrabajoId = new JLabel("N/A");
-        panelTrabajo.add(new JLabel("Trabajo ID:"));
-        panelTrabajo.add(lblTrabajoId);
+        // Panel de selección de trabajo
+        JPanel panelTrabajo = new JPanel(new BorderLayout(10, 0));
+        panelTrabajo.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel lblTrabajo = new JLabel("Seleccionar Trabajo:");
+        lblTrabajo.setPreferredSize(new Dimension(150, 25));
+        cbTrabajos = new JComboBox<>();
+        configurarComboTrabajos();
+        panelTrabajo.add(lblTrabajo, BorderLayout.WEST);
+        panelTrabajo.add(cbTrabajos, BorderLayout.CENTER);
 
         // Panel de selección de lote
-        JPanel panelLote = new JPanel(new GridLayout(2, 2, 5, 5));
+        JPanel panelLote = new JPanel(new BorderLayout(10, 0));
+        panelLote.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel lblLote = new JLabel("Lote:");
+        lblLote.setPreferredSize(new Dimension(150, 25));
         cbLotes = new JComboBox<>();
-        cbLotes.setPreferredSize(new Dimension(200, 25));
+        configurarComboLotes();
+        panelLote.add(lblLote, BorderLayout.WEST);
+        panelLote.add(cbLotes, BorderLayout.CENTER);
+
+        // Panel de cantidad
+        JPanel panelCantidad = new JPanel(new BorderLayout(10, 0));
+        panelCantidad.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel lblCantidad = new JLabel("Cantidad:");
+        lblCantidad.setPreferredSize(new Dimension(150, 25));
         txtCantidad = new JTextField();
-        lblStock = new JLabel("Stock disponible: -");
+        panelCantidad.add(lblCantidad, BorderLayout.WEST);
+        panelCantidad.add(txtCantidad, BorderLayout.CENTER);
 
-
-        txtLote = new JTextField(15);
-        btnBuscarLote = new JButton("Buscar Lote");
-
-        panelLote.add(new JLabel("Lote:"));
-        panelLote.add(cbLotes);
-
-        panelLote.add(btnBuscarLote);
-        panelLote.add(new JLabel("Cantidad:"));
-        panelLote.add(txtCantidad);
-        panelLote.add(new JLabel("Stock:"));
-        panelLote.add(lblStock);
+        // Panel de stock
+        JPanel panelStock = new JPanel(new BorderLayout(10, 0));
+        panelStock.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel lblStockLabel = new JLabel("Stock:");
+        lblStockLabel.setPreferredSize(new Dimension(150, 25));
+        lblStock = new JLabel("Stock disponible: 0");
+        panelStock.add(lblStockLabel, BorderLayout.WEST);
+        panelStock.add(lblStock, BorderLayout.CENTER);
 
         // Botón para guardar
+        JPanel panelBotonGuardar = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelBotonGuardar.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
         btnGuardar = new JButton("Registrar Repuesto");
         btnGuardar.setBackground(new Color(0, 102, 204));
         btnGuardar.setForeground(Color.WHITE);
+        panelBotonGuardar.add(btnGuardar);
 
+        // Agregar todos los paneles al formulario
         panelFormulario.add(panelTrabajo);
         panelFormulario.add(panelLote);
-        panelFormulario.add(btnGuardar);
+        panelFormulario.add(panelCantidad);
+        panelFormulario.add(panelStock);
+        panelFormulario.add(panelBotonGuardar);
 
         // Panel central (tabla de detalles)
+        JPanel panelTabla = new JPanel(new BorderLayout());
+        panelTabla.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        
         tblDetalles = new JTable();
         JScrollPane scrollPane = new JScrollPane(tblDetalles);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Repuestos utilizados"));
+        panelTabla.add(scrollPane, BorderLayout.CENTER);
 
         // Panel inferior (botones)
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -81,9 +104,169 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
 
         // Agregar componentes al panel principal
         add(panelFormulario, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(panelTabla, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
     }
+    
+    private void configurarComboTrabajos() {
+        cbTrabajos.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof TrabajoCombo) {
+                    TrabajoCombo tc = (TrabajoCombo) value;
+                    setText(tc.toString());
+                }
+                return this;
+            }
+        });
+        
+        // Añadir listener para debug
+        cbTrabajos.addActionListener(e -> {
+            TrabajoCombo seleccionado = (TrabajoCombo) cbTrabajos.getSelectedItem();
+            System.out.println("Trabajo seleccionado: " + (seleccionado != null ? seleccionado.getId() : "null"));
+        });
+    }
+    
+    private void configurarComboLotes() {
+        cbLotes.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof LoteCombo) {
+                    LoteCombo lc = (LoteCombo) value;
+                    setText(lc.toString());
+                }
+                return this;
+            }
+        });
+        
+        // Añadir listener para debug
+        cbLotes.addActionListener(e -> {
+            LoteCombo seleccionado = (LoteCombo) cbLotes.getSelectedItem();
+            if (seleccionado != null) {
+                System.out.println("Lote seleccionado: " + seleccionado.getId() + ", Stock: " + seleccionado.getStock());
+                setStockDisponible(seleccionado.getStock());
+            }
+        });
+    }
+
+    // Clase interna para manejar el combo de trabajos
+    public static class TrabajoCombo {
+        private final Integer id;
+        private final String displayText;
+        private final Trabajo trabajo;
+
+        public TrabajoCombo(Trabajo trabajo) {
+            this.trabajo = trabajo;
+            this.id = trabajo.getIdTrabajo();
+            this.displayText = "Trabajo #" + trabajo.getIdTrabajo() + " - " + 
+                              (trabajo.getVehiculo() != null ? trabajo.getVehiculo().getPlaca() : "Sin vehículo");
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public Trabajo getTrabajo() {
+            return trabajo;
+        }
+
+        @Override
+        public String toString() {
+            return displayText;
+        }
+    }
+    
+    // Clase interna para manejar el combo de lotes
+    public static class LoteCombo {
+        private final Integer id;
+        private final String displayText;
+        private final Lote lote;
+        private final Integer stock;
+
+        public LoteCombo(Lote lote) {
+            this.lote = lote;
+            this.id = lote.getId();
+            this.stock = lote.getCantidadDisponible();
+            String repuestoInfo = lote.getIdrepuesto() != null ? lote.getIdrepuesto().toString() : "Sin repuesto";
+            this.displayText = "Lote #" + lote.getId() + " - " + repuestoInfo + " (Disp: " + lote.getCantidadDisponible() + ")";
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public Integer getStock() {
+            return stock;
+        }
+
+        public Lote getLote() {
+            return lote;
+        }
+
+        @Override
+        public String toString() {
+            return displayText;
+        }
+    }
+
+    public void setTrabajoSelectionListener(ActionListener listener) {
+        if (cbTrabajos != null && listener != null) {
+            cbTrabajos.addActionListener(listener);
+        }
+    }
+
+    public void cargarTrabajos(List<Trabajo> trabajos) {
+        if (cbTrabajos != null) {
+            DefaultComboBoxModel<TrabajoCombo> model = new DefaultComboBoxModel<>();
+            
+            // Opción por defecto
+            model.addElement(new TrabajoCombo(new Trabajo() {
+                {
+                    setIdTrabajo(-1);
+                }
+                
+                @Override
+                public String toString() {
+                    return "-- Seleccione un trabajo --";
+                }
+            }));
+            
+            if (trabajos != null) {
+                for (Trabajo trabajo : trabajos) {
+                    model.addElement(new TrabajoCombo(trabajo));
+                }
+            }
+            
+            // Actualización segura en el hilo de eventos
+            SwingUtilities.invokeLater(() -> {
+                cbTrabajos.setModel(model);
+                System.out.println("[DEBUG] ComboBox de trabajos actualizado con " + model.getSize() + " elementos");
+                
+                // Seleccionar el primer elemento si existe
+                if (model.getSize() > 1) {
+                    cbTrabajos.setSelectedIndex(0); // Seleccionar la opción por defecto
+                }
+                
+                cbTrabajos.revalidate();
+                cbTrabajos.repaint();
+            });
+        }
+    }
+
+    public Trabajo getTrabajoSeleccionado() {
+        if (cbTrabajos != null && cbTrabajos.getSelectedItem() instanceof TrabajoCombo) {
+            TrabajoCombo seleccionado = (TrabajoCombo) cbTrabajos.getSelectedItem();
+            if (seleccionado.getId() != -1) { // No es la opción por defecto
+                return seleccionado.getTrabajo();
+            }
+        }
+        return null;
+    }
+
     public void setBuscarLoteListener(ActionListener listener) {
         if (btnBuscarLote != null && listener != null) {
             // Eliminar listeners anteriores para evitar duplicados
@@ -105,6 +288,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     public String getNumeroLote() {
         return txtLote != null ? txtLote.getText().trim() : "";
     }
+    
     // Métodos para interactuar con el controlador
     public void setLoteSelectionListener(ActionListener listener) {
         if (cbLotes != null && listener != null) {
@@ -114,21 +298,40 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
 
     public void cargarLotes(List<Lote> lotes) {
         if (cbLotes != null) {
-            DefaultComboBoxModel<Lote> model = new DefaultComboBoxModel<>();
+            DefaultComboBoxModel<LoteCombo> model = new DefaultComboBoxModel<>();
+            
+            // Opción por defecto
+            model.addElement(new LoteCombo(new Lote() {
+                {
+                    setId(-1);
+                    setCantidadDisponible(0);
+                }
+                
+                @Override
+                public String toString() {
+                    return "-- Seleccione un lote --";
+                }
+            }));
+            
             if (lotes != null) {
                 for (Lote lote : lotes) {
-                    model.addElement(lote);
+                    model.addElement(new LoteCombo(lote));
                 }
             }
-            cbLotes.setModel(model);
-
-            // Actualizar stock del primer lote si existe
-            if (model.getSize() > 0) {
-                Lote primerLote = model.getElementAt(0);
-                setStockDisponible(primerLote.getCantidadDisponible());
-            } else {
-                setStockDisponible(0);
-            }
+            
+            // Actualización segura en el hilo de eventos
+            SwingUtilities.invokeLater(() -> {
+                cbLotes.setModel(model);
+                System.out.println("[DEBUG] ComboBox de lotes actualizado con " + model.getSize() + " elementos");
+                
+                // Seleccionar el primer elemento si existe
+                if (model.getSize() > 1) {
+                    cbLotes.setSelectedIndex(0); // Seleccionar la opción por defecto
+                }
+                
+                cbLotes.revalidate();
+                cbLotes.repaint();
+            });
         }
     }
 
@@ -141,12 +344,6 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     public void setEliminarListener(ActionListener listener) {
         if (btnEliminar != null && listener != null) {
             btnEliminar.addActionListener(listener);
-        }
-    }
-
-    public void mostrarInfoTrabajo(String idTrabajo) {
-        if (lblTrabajoId != null) {
-            lblTrabajoId.setText(idTrabajo != null ? idTrabajo : "N/A");
         }
     }
 
@@ -165,7 +362,13 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     }
 
     public Lote getLoteSeleccionado() {
-        return cbLotes != null ? (Lote) cbLotes.getSelectedItem() : null;
+        if (cbLotes != null && cbLotes.getSelectedItem() instanceof LoteCombo) {
+            LoteCombo seleccionado = (LoteCombo) cbLotes.getSelectedItem();
+            if (seleccionado.getId() != -1) { // No es la opción por defecto
+                return seleccionado.getLote();
+            }
+        }
+        return null;
     }
 
     public void mostrarDetalles(List<DetalleTrabajoRepuesto> detalles) {
@@ -185,13 +388,8 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
 
     public void limpiarFormulario() {
         if (txtCantidad != null) txtCantidad.setText("");
+        if (txtLote != null) txtLote.setText("");
         setStockDisponible(0);
     }
-
-    // En el controlador:
-    /**
-     * Establece el listener para el botón de búsqueda de lote
-     * @param listener El ActionListener que manejará el evento de búsqueda
-     */
-
+    
 }

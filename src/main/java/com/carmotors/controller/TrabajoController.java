@@ -56,8 +56,8 @@ public class TrabajoController {
 
             // Crear objeto trabajo
             Trabajo trabajo = new Trabajo();
-            trabajo.setIdVehiculo(vista.getVehiculoSeleccionado().getId());
-            trabajo.setIdServicio(vista.getServicioSeleccionado().getIdServicio());
+            trabajo.setVehiculo(vista.getVehiculoSeleccionado());
+            trabajo.setServicio(vista.getServicioSeleccionado());
             trabajo.setFechaRecepcion(LocalDate.now());
 
             // Manejo opcional de fecha de entrega

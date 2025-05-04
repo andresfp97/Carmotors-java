@@ -4,7 +4,45 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2fb89089-6cd2-4efe-a49c-fbd78c2a9cc9" name="Changes" comment="primer commit" />
+    <list default="true" id="2fb89089-6cd2-4efe-a49c-fbd78c2a9cc9" name="Changes" comment="primer commit">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/DetalleTrabajoRepuestoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/DetalleTrabajoRepuestoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/ServicioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/ServicioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/TrabajoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/TrabajoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/VehiculoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/controller/VehiculoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/DetalleTrabajoRepuesto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/DetalleTrabajoRepuesto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Servicio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Servicio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Trabajo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Trabajo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Vehiculo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/Vehiculo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/enums/EstadoServicio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/enums/EstadoServicio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/model/enums/TipoMantenimiento.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/model/enums/TipoMantenimiento.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/DetalleTrabajoRepuestoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/DetalleTrabajoRepuestoDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/ServicioDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/ServicioDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/TrabajoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/TrabajoDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/VehiculoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/modelDAO/VehiculoDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/run/ProyectoJAVA_CarMotors_AndersonAndresAda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/run/ProyectoJAVA_CarMotors_AndersonAndresAda.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/DetalleTableModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/DetalleTableModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelDetalleTrabajoRepuesto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelDetalleTrabajoRepuesto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelRepuesto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelRepuesto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelServicio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelServicio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelTrabajo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelTrabajo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelVehiculo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/PanelVehiculo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/VentanaPrincipal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carmotors/view/VentanaPrincipal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carmotors/view/prueba.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/carmotors/controller/prueba.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/carmotors/controller/prueba.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/carmotors/modelDAO/TrabajoDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/carmotors/modelDAO/TrabajoDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/carmotors/run/ProyectoJAVA_CarMotors_AndersonAndresAda.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/carmotors/run/ProyectoJAVA_CarMotors_AndersonAndresAda.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/carmotors/view/VentanaPrincipal.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/carmotors/view/VentanaPrincipal.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,24 +59,29 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JonnyJaimes"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JonnyJaimes&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/andresfp97/Carmotors-java.git",
-    "accountId": "c1a96751-453e-425c-9388-5e928d17c997"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/andresfp97/Carmotors-java.git&quot;,
+    &quot;accountId&quot;: &quot;c1a96751-453e-425c-9388-5e928d17c997&quot;
   }
-}]]></component>
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file:///tmp/tmp_1_ProyectoJAVA_CarMotors_AndersonAndresAda.class" root0="SKIP_INSPECTION" />
+    <setting file="file:///tmp/tmp_2_ProyectoJAVA_CarMotors_AndersonAndresAda.class" root0="SKIP_INSPECTION" />
+    <setting file="file:///tmp/tmp__ProyectoJAVA_CarMotors_AndersonAndresAda.class" root0="SKIP_INSPECTION" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2wbC1nogPEOAP9GPrRVhjwz5Vlk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -49,7 +92,8 @@
     "Application.ProyectoJAVA_CarMotors_AndersonAndresAda.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "joonny"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/jonnyedward/Descargas/WhatSie/Carmotors-java"
   }
 }]]></component>
   <component name="RunManager">

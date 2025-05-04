@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServicioDAO {
-    private Connection con;
+    
 
     public ServicioDAO() {
-        con = Conexion.getConexion().getConnection();
     }
 
     public boolean agregar(Servicio servicio) {
         String sql = "INSERT INTO servicio (tipo_mantenimiento, descripcion, costo_mano_obra, estado_servicio, tiempo_estimado) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection con = Conexion.getConexion().getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (
+            Connection con = Conexion.getConexion().getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             // Los índices deben ser secuenciales y coincidir con los parámetros en la consulta SQL
             pstmt.setString(1, servicio.getTipoMantenimiento().name());  // Primer parámetro (tipo_mantenimiento)
@@ -40,7 +40,9 @@ public class ServicioDAO {
     public Servicio obtenerPorId(int idServicio) {
         String sql = "SELECT id_servicio, tipo_mantenimiento, descripcion, costo_mano_obra, estado_servicio, tiempo_estimado FROM servicio WHERE id_servicio = ?";
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (
+            Connection con = Conexion.getConexion().getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, idServicio);
 
             try (ResultSet rs = pstmt.executeQuery()) {
