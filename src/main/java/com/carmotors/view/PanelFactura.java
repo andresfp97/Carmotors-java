@@ -65,10 +65,17 @@ public class PanelFactura extends JPanel {
         return (Trabajo) cbTrabajos.getSelectedItem();
     }
 
-    public void cargarTrabajos(Object trabajos) {
+    public void cargarTrabajos(List<Trabajo> trabajos) {
         DefaultComboBoxModel<Trabajo> model = new DefaultComboBoxModel<>();
-        model.addAll((List<Trabajo>) trabajos);
+        if (trabajos != null) {
+            System.out.println("Cargando " + trabajos.size() + " trabajos"); // Debug
+            for (Trabajo trabajo : trabajos) {
+                model.addElement(trabajo);
+                System.out.println("Trabajo añadido: " + trabajo.getId()); // Debug
+            }
+        }
         cbTrabajos.setModel(model);
+        cbTrabajos.setSelectedIndex(-1); // Sin selección por defecto
     }
 
     public void mostrarMensaje(String mensaje) {
@@ -86,20 +93,33 @@ public class PanelFactura extends JPanel {
 
     public void mostrarFacturaGenerada(Factura factura) {
         String detalle = String.format(
-                "FACTURA #%s\n\n" +
-                        "Cliente: %s\n" +
-                        "Fecha: %s\n" +
-                        "CUFE: %s\n\n" +
-                        "Subtotal: $%.2f\n" +
-                        "IVA (19%%): $%.2f\n" +
-                        "TOTAL: $%.2f",
+                "TALLER AUTOMOTRIZ MOTORES & RUEDAS\n" +
+                "NIT: 900.123.456-7\n" +
+                "Dirección: Calle 123 #45-67, Bogotá\n" +
+                "Teléfono: +57 1 2345678\n\n" +
+                "FACTURA ELECTRÓNICA\n" +
+                "Número: %s\n" +
+                "Fecha: %s\n" +
+                "CUFE: %s\n\n" +
+                "Cliente: %s\n" +
+                "Identificación: %s\n\n" +
+                "Detalle de la factura\n" +
+                "Subtotal: %.2f\n" +
+                "Impuestos: %.2f\n" +
+                "Total: %.2f\n\n" +
+                "TALLER AUTOMOTRIZ MOTORES & RUEDAS\n" +
+                "NIT: 900.123.456-7\n" +
+                "Dirección: Calle 123 #45-67, Bogotá\n" +
+                "Teléfono: +57 1 2345678",
                 factura.getNumeroFactura(),
-                factura.getIdCliente().getNombre(),
                 factura.getFechaEmision(),
                 factura.getCUFE(),
+                factura.getIdCliente().getNombre(),
+                factura.getIdCliente().getIdentificacion(), // Añadido aquí
                 factura.getSubtotal(),
                 factura.getImpuestos(),
                 factura.getTotal());
+        
         txtDetalleFactura.setText(detalle);
     }
 

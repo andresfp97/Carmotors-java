@@ -94,15 +94,11 @@ public class Lote {
 
     @Override
     public String toString() {
-        return "Lote{" +
-                "id=" + id +
-                ", Idrepuesto=" + Idrepuesto +
-                ", Idproveedor=" + Idproveedor +
-                ", FechaIngreso=" + FechaIngreso +
-                ", cantidadInicial=" + cantidadInicial +
-                ", cantidadDisponible=" + cantidadDisponible +
-                ", estado=" + estado +
-                '}';
+        return "Lote [id=" + id + ", Idrepuesto=" + Idrepuesto + ", Idproveedor=" + Idproveedor + ", FechaIngreso="
+                + FechaIngreso + ", cantidadInicial=" + cantidadInicial + ", cantidadDisponible=" + cantidadDisponible
+                + ", estado=" + estado + "]";
     }
+
+    
 }
 

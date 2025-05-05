@@ -83,12 +83,6 @@ public class Repuesto {
         this.vidaUtilEstimada = vidaUtilEstimada;
     }
 
-    @Override
-    public String toString() {
-        return "Repuesto{" + "id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", marca=" + marca + ", modeloCompatible=" + modeloCompatible + ", vidaUtilEstimada=" + vidaUtilEstimada + '}';
-    }
-
-
     public boolean estaPorVencer() {
         if (vidaUtilEstimada == null) return false;
 
@@ -105,6 +99,15 @@ public class Repuesto {
     public void setPrecio(Integer precio) {
         this.precio = precio;
     }
+
+    @Override
+    public String toString() {
+        return "Repuesto [id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", marca=" + marca
+                + ", modeloCompatible=" + modeloCompatible + ", vidaUtilEstimada=" + vidaUtilEstimada + ", precio="
+                + precio + "]";
+    }
+
+    
 
     
 }

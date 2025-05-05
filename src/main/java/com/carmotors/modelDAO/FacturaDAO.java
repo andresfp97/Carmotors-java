@@ -2,7 +2,9 @@ package com.carmotors.modelDAO;
 
 import com.carmotors.model.Cliente;
 import com.carmotors.model.Factura;
+import com.carmotors.model.Servicio;
 import com.carmotors.model.Trabajo;
+import com.carmotors.model.Vehiculo;
 import com.carmotors.util.Conexion;
 import java.sql.*;
 import java.time.LocalDate;
@@ -131,6 +133,7 @@ public class FacturaDAO {
         }
         return 1;
     }
+    /* 
     public List<Trabajo> obtenerTrabajosParaFacturar() {
         List<Trabajo> trabajos = new ArrayList<>();
         String sql = "SELECT * FROM trabajo WHERE id_trabajo NOT IN (SELECT id_trabajo FROM factura)";
@@ -149,4 +152,51 @@ public class FacturaDAO {
         }
         return trabajos;
     }
+        */
+
+    public List<Trabajo> obtenerTrabajosParaFacturar() {
+    List<Trabajo> trabajos = new ArrayList<>();
+    String sql = "SELECT t.*, v.*, c.*, s.* FROM trabajo t " +
+                 "LEFT JOIN vehiculo v ON t.id_vehiculo = v.id_vehiculo " +
+                 "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
+                 "LEFT JOIN servicio s ON t.id_servicio = s.id_servicio " +
+                 "WHERE t.id_trabajo NOT IN (SELECT id_trabajo FROM factura)";
+    
+    try (Connection con = Conexion.getConexion().getConnection();
+         PreparedStatement pstmt = con.prepareStatement(sql)) {
+         
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            Trabajo trabajo = new Trabajo();
+            trabajo.setIdTrabajo(rs.getInt("id_trabajo"));
+            // Configurar otros campos del trabajo
+            
+            // Configurar vehículo
+            Vehiculo vehiculo = new Vehiculo();
+            vehiculo.setId(rs.getInt("id_vehiculo"));
+            // Configurar otros campos del vehículo
+            
+            // Configurar cliente
+            Cliente cliente = new Cliente();
+            cliente.setId(rs.getInt("id_cliente"));
+            cliente.setNombre(rs.getString("nombre"));
+            // Configurar otros campos del cliente
+            
+            vehiculo.setCliente(cliente);
+            trabajo.setVehiculo(vehiculo);
+            
+            // Configurar servicio
+            Servicio servicio = new Servicio();
+            servicio.setIdServicio(rs.getInt("id_servicio"));
+            servicio.setDescripcion(rs.getString("descripcion"));
+            servicio.setCostoManoObra(rs.getDouble("costo_mano_obra"));
+            trabajo.setServicio(servicio);
+            
+            trabajos.add(trabajo);
+        }
+    } catch (SQLException e) {
+        LOGGER.severe("Error al obtener trabajos facturables: " + e.getMessage());
+    }
+    return trabajos;
+}
 }

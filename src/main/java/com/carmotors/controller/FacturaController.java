@@ -150,6 +150,14 @@ public class FacturaController {
 
     private void generarFacturaVisual(Factura factura) {
         try {
+            // Debug: Mostrar datos completos de la factura
+            System.out.println("[DEBUG] Datos completos de la factura:");
+            System.out.println("Número: " + factura.getNumeroFactura());
+            System.out.println(
+                    "Cliente: " + (factura.getIdCliente() != null ? factura.getIdCliente().getNombre() : "null"));
+            System.out.println("Fecha: " + factura.getFechaEmision());
+            System.out.println("Total: " + factura.getTotal());
+
             FacturaGenerator.generarFactura(factura);
             vista.mostrarFacturaGenerada(factura);
 
@@ -180,9 +188,6 @@ public class FacturaController {
         vista.cargarTrabajos(trabajoDAO.obtenerTrabajosParaFacturar());
     }
 
-
-    
-
     /**
      * Establece el listener para generar factura
      * 
@@ -197,15 +202,22 @@ public class FacturaController {
     private Factura crearFacturaBase(Trabajo trabajo) {
         Factura factura = new Factura();
 
-        // Obtener el cliente completo
+        // Obtener el cliente completo con todos sus datos
         Cliente cliente = trabajo.getVehiculo().getCliente();
         if (cliente == null || cliente.getNombre() == null) {
             int idCliente = trabajo.getVehiculo().getId();
             cliente = clienteDAO.obtenerPorId(idCliente);
             trabajo.getVehiculo().setCliente(cliente);
         }
-        factura.setIdCliente(cliente);
 
+        // Debug: Verificar datos del cliente
+        System.out.println("[DEBUG] Datos completos del cliente:");
+        System.out.println("Nombre: " + cliente.getNombre());
+        System.out.println("Identificación: " + cliente.getIdentificacion());
+        System.out.println("Teléfono: " + cliente.getTelefono());
+        System.out.println("Email: " + cliente.getCorreoElectronico());
+
+        factura.setIdCliente(cliente);
         factura.setIdTrabajo(trabajo);
         factura.setFechaEmision(LocalDate.now());
         factura.setNumeroFactura(generarNumeroFactura());
@@ -221,25 +233,25 @@ public class FacturaController {
     }
 
     public int obtenerConsecutivoDiario() {
-    int consecutivo = 1;
-    String fechaHoy = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    String prefix = "FAC-" + fechaHoy + "-";
-    String sql = "SELECT numero_factura FROM factura WHERE numero_factura LIKE ? ORDER BY numero_factura DESC LIMIT 1";
-    try (Connection conn = Conexion.getConexion().getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, "FAC-" + fechaHoy + "-%");
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            String numeroFactura = rs.getString("numero_factura");
-            // Extrae la parte numérica después del último guion
-            String[] partes = numeroFactura.split("-");
-            if (partes.length == 3) {
-                consecutivo = Integer.parseInt(partes[2]) + 1;
+        int consecutivo = 1;
+        String fechaHoy = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String prefix = "FAC-" + fechaHoy + "-";
+        String sql = "SELECT numero_factura FROM factura WHERE numero_factura LIKE ? ORDER BY numero_factura DESC LIMIT 1";
+        try (Connection conn = Conexion.getConexion().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "FAC-" + fechaHoy + "-%");
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String numeroFactura = rs.getString("numero_factura");
+                // Extrae la parte numérica después del último guion
+                String[] partes = numeroFactura.split("-");
+                if (partes.length == 3) {
+                    consecutivo = Integer.parseInt(partes[2]) + 1;
+                }
             }
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException | NumberFormatException e) {
-        e.printStackTrace();
+        return consecutivo;
     }
-    return consecutivo;
-}
 }

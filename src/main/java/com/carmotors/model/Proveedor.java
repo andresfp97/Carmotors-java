@@ -68,11 +68,9 @@ public class Proveedor {
     @Override
     public String toString() {
         return "Proveedor [id=" + id + ", nombre=" + nombre + ", nit=" + nit + ", contacto=" + contacto
-                + ", frecuenciaVisitas=" + frecuenciaVisitas + ", getId()=" + getId() + ", getNombre()=" + getNombre()
-                + ", getNit()=" + getNit() + ", getContacto()=" + getContacto() + ", getFrecuenciaVisitas()="
-                + getFrecuenciaVisitas() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-                + super.toString() + "]";
+                + ", frecuenciaVisitas=" + frecuenciaVisitas + "]";
     }
+
 
 
     

@@ -16,8 +16,8 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         String sql = "INSERT INTO vehiculo (id_cliente, marca, modelo, placa, tipo_vehiculo) VALUES (?, ?, ?, ?, ?)";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, vehiculo.getCliente().getId());
             pstmt.setString(2, vehiculo.getMarca());
             pstmt.setString(3, vehiculo.getModelo());
@@ -40,13 +40,12 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         return false;
     }
 
-
     public boolean actualizar(Vehiculo vehiculo) {
         String sql = "UPDATE vehiculo SET id_cliente = ?, marca = ?, modelo = ?, placa = ?, tipo_vehiculo = ? WHERE id_vehiculo = ?";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, vehiculo.getCliente().getId());
             pstmt.setString(2, vehiculo.getMarca());
             pstmt.setString(3, vehiculo.getModelo());
@@ -61,13 +60,12 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         return false;
     }
 
-
     public boolean eliminar(Integer id) {
         String sql = "DELETE FROM vehiculo WHERE id_vehiculo = ?";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -76,38 +74,36 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         return false;
     }
 
-
-
-    public Vehiculo obtenerPorId(Integer id) {
-        String sql = "SELECT v.*, c.id_cliente, c.nombre as nombre_cliente " +
-                    "FROM vehiculo v LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
-                    "WHERE v.id_vehiculo = ?";
+    // En VehiculoDAO.obtenerPorId():
+    public Vehiculo obtenerPorId(int id) {
+        String sql = "SELECT v.*, c.* FROM vehiculo v " +
+                "LEFT JOIN cliente c ON v.id_cliente = c.id_cliente " +
+                "WHERE v.id_vehiculo = ?";
         Vehiculo vehiculo = null;
 
         try (Connection con = Conexion.getConexion().getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
-            
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
+
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 vehiculo = new Vehiculo();
                 vehiculo.setId(rs.getInt("id_vehiculo"));
-                
-                // Corrección clave: crear y asignar cliente correctamente
+                // ... otros campos del vehículo ...
+
+                // Cargar cliente completo
                 Cliente cliente = new Cliente();
                 cliente.setId(rs.getInt("id_cliente"));
-                cliente.setNombre(rs.getString("nombre_cliente"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setIdentificacion(rs.getString("identificacion"));
+                cliente.setTelefono(rs.getString("telefono"));
+                cliente.setCorreoElectronico(rs.getString("correo_electronico"));
+
                 vehiculo.setCliente(cliente);
-                
-                vehiculo.setMarca(rs.getString("marca"));
-                vehiculo.setModelo(rs.getString("modelo"));
-                vehiculo.setPlaca(rs.getString("placa"));
-                vehiculo.setTipoVehiculo(rs.getString("tipo_vehiculo"));
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener vehículo: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error al obtener vehículo por ID: " + e.getMessage());
         }
         return vehiculo;
     }
@@ -117,9 +113,9 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         String sql = "SELECT * FROM vehiculo";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Vehiculo vehiculo = new Vehiculo();
@@ -145,8 +141,8 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         String sql = "SELECT * FROM vehiculo WHERE id_cliente = ?";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, idCliente);
             ResultSet rs = pstmt.executeQuery();
 
@@ -173,8 +169,8 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         String sql = "SELECT COUNT(*) FROM vehiculo WHERE placa = ?";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, placa);
             ResultSet rs = pstmt.executeQuery();
 
@@ -191,8 +187,8 @@ public class VehiculoDAO implements CrudDAO<Vehiculo> {
         String sql = "SELECT id_vehiculo FROM vehiculo WHERE id_vehiculo = ?";
 
         try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
+                Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, idVehiculo);
 
             try (ResultSet rs = pstmt.executeQuery()) {

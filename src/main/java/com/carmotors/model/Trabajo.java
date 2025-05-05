@@ -13,7 +13,11 @@ public class Trabajo {
     private LocalDate fechaEntrega;
     private String tecnicoAsignado;
     private List<DetalleTrabajoRepuesto> repuestosUtilizados;
+    
+    
+    public Trabajo() {
 
+    }
     // Constructor
     public Trabajo(int idTrabajo, Vehiculo vehiculo, Servicio servicio,
             LocalDate fechaRecepcion, LocalDate fechaEntrega,
@@ -26,8 +30,9 @@ public class Trabajo {
         this.tecnicoAsignado = tecnicoAsignado;
     }
 
-    public Trabajo() {
-
+   
+    public int getId() {
+        return idTrabajo;
     }
 
     // Getters y Setters
@@ -79,13 +84,6 @@ public class Trabajo {
         this.tecnicoAsignado = tecnicoAsignado;
     }
 
-    @Override
-    public String toString() {
-        String fecha = fechaRecepcion != null ? fechaRecepcion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                : "Sin fecha";
-        return "Trabajo #" + idTrabajo + " - " + fecha;
-    }
-
     public List<DetalleTrabajoRepuesto> getRepuestosUtilizados() {
         if (repuestosUtilizados == null) {
             System.out.println("[DEBUG] Lista de repuestos es null, inicializando...");
@@ -97,9 +95,18 @@ public class Trabajo {
     public void setRepuestosUtilizados(List<DetalleTrabajoRepuesto> repuestosUtilizados) {
         this.repuestosUtilizados = repuestosUtilizados;
     }
-
-    public int getId() {
-        return idTrabajo;
+    @Override
+    public String toString() {
+        return "Trabajo [idTrabajo=" + idTrabajo + ", vehiculo=" + vehiculo + ", servicio=" + servicio
+                + ", fechaRecepcion=" + fechaRecepcion + ", fechaEntrega=" + fechaEntrega + ", tecnicoAsignado="
+                + tecnicoAsignado + ", repuestosUtilizados=" + repuestosUtilizados + ", getId()=" + getId()
+                + ", getIdTrabajo()=" + getIdTrabajo() + ", getVehiculo()=" + getVehiculo() + ", getServicio()="
+                + getServicio() + ", getFechaRecepcion()=" + getFechaRecepcion() + ", getFechaEntrega()="
+                + getFechaEntrega() + ", getTecnicoAsignado()=" + getTecnicoAsignado() + ", getRepuestosUtilizados()="
+                + getRepuestosUtilizados() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+                + ", toString()=" + super.toString() + "]";
     }
+
+   
 
 }

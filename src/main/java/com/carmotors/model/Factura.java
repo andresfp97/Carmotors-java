@@ -18,7 +18,7 @@ public class Factura {
     public Factura() {
     }
 
-    public Factura(Integer idCliente, Integer idTrabajo, LocalDate fechaEmision,
+    public Factura(Cliente cliente, Trabajo trabajo, LocalDate fechaEmision,
             String numeroFactura, Double subtotal) {
         this.cliente = cliente;
         this.trabajo = trabajo;
@@ -38,7 +38,7 @@ public class Factura {
     public Cliente getIdCliente() {
         return cliente;
     }
-    
+
     public void setIdCliente(Cliente cliente2) {
         this.cliente = cliente2;
     }
@@ -109,18 +109,9 @@ public class Factura {
 
     @Override
     public String toString() {
-        return "Factura{" +
-                "idFactura=" + idFactura +
-                ", idCliente=" + cliente.getId() +
-                ", idTrabajo=" + trabajo.getId() +
-                ", fechaEmision=" + fechaEmision +
-                ", numeroFactura='" + numeroFactura + '\'' +
-                ", CUFE='" + CUFE + '\'' +
-                ", subtotal=" + subtotal +
-                ", impuestos=" + impuestos +
-                ", total=" + total +
-                ", qrCodigo='" + qrCodigo + '\'' +
-                '}';
+        return "Factura [idFactura=" + idFactura + ", cliente=" + cliente + ", trabajo=" + trabajo + ", fechaEmision="
+                + fechaEmision + ", numeroFactura=" + numeroFactura + ", CUFE=" + CUFE + ", subtotal=" + subtotal
+                + ", impuestos=" + impuestos + ", total=" + total + ", qrCodigo=" + qrCodigo + "]";
     }
 
     public boolean isValid() {
