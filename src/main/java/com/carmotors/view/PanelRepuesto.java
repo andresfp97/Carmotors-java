@@ -2,6 +2,7 @@ package com.carmotors.view;
 
 import com.carmotors.model.enums.EstadoLote;
 import com.carmotors.model.Lote;
+import com.carmotors.model.Proveedor;
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.TipoRepuesto;
 import org.jdatepicker.impl.JDatePanelImpl;
@@ -13,9 +14,6 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Properties;
 
-
-
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -25,7 +23,7 @@ import java.util.Date;
 
 public class PanelRepuesto extends JPanel {
     private JTextField txtNombre, txtMarca, txtModelo, txtIdRepuesto, txtIdProveedor,
-            txtCatidadInicial, txtCatidadDisponible;
+            txtCatidadInicial, txtCatidadDisponible, txtPrecio;
     private JButton btnGuardar, btnGuardarLote;
     private JComboBox<String> txtEstado, txtTipo;
     private JDatePickerImpl datePickerVidaUtil, datePickerFechaIngreso;
@@ -54,9 +52,11 @@ public class PanelRepuesto extends JPanel {
 
         // Componentes del formulario
         addFormRow(formSuperior, gbc, 0, "Nombre:", txtNombre = createStyledTextField(15));
-        addFormRow(formSuperior, gbc, 1, "Tipo:", txtTipo = createStyledComboBox(new String[]{"Mecanico", "Electrico", "Carroceria", "Consumo"}));
+        addFormRow(formSuperior, gbc, 1, "Tipo:",
+                txtTipo = createStyledComboBox(new String[] { "Mecanico", "Electrico", "Carroceria", "Consumo" }));
         addFormRow(formSuperior, gbc, 2, "Marca:", txtMarca = createStyledTextField(15));
         addFormRow(formSuperior, gbc, 3, "Modelo Compatible:", txtModelo = createStyledTextField(15));
+        addFormRow(formSuperior, gbc, 4, "Precio:", txtPrecio = createStyledTextField(15));
 
         // Selector de fechas para Vida Útil Estimada
         UtilDateModel model = new UtilDateModel();
@@ -70,7 +70,7 @@ public class PanelRepuesto extends JPanel {
         JPanel datePanelWrapper = new JPanel(new BorderLayout());
         datePanelWrapper.setBackground(Color.WHITE);
         datePanelWrapper.add(datePickerVidaUtil, BorderLayout.WEST);
-        addFormRow(formSuperior, gbc, 4, "Vida Útil Estimada:", datePanelWrapper);
+        addFormRow(formSuperior, gbc, 5, "Vida Útil Estimada:", datePanelWrapper);
 
         panelSuperior.add(formSuperior);
 
@@ -113,7 +113,8 @@ public class PanelRepuesto extends JPanel {
         addFormRow(formInferior, gbc, 2, "Fecha Ingreso:", datePanelWrapper2);
         addFormRow(formInferior, gbc, 3, "Cantidad Inicial:", txtCatidadInicial = createStyledTextField(15));
         addFormRow(formInferior, gbc, 4, "Cantidad Disponible:", txtCatidadDisponible = createStyledTextField(15));
-        addFormRow(formInferior, gbc, 5, "Estado:", txtEstado = createStyledComboBox(new String[]{"Disponible", "Reservado", "Fuera de servicio"}));
+        addFormRow(formInferior, gbc, 5, "Estado:",
+                txtEstado = createStyledComboBox(new String[] { "Disponible", "Reservado", "Fuera de servicio" }));
 
         panelInferior.add(formInferior);
 
@@ -136,8 +137,7 @@ public class PanelRepuesto extends JPanel {
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)
-        ));
+                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
         return field;
     }
 
@@ -147,8 +147,7 @@ public class PanelRepuesto extends JPanel {
         combo.setBackground(Color.WHITE);
         combo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(2, 8, 2, 8)
-        ));
+                BorderFactory.createEmptyBorder(2, 8, 2, 8)));
         return combo;
     }
 
@@ -158,8 +157,7 @@ public class PanelRepuesto extends JPanel {
         field.setColumns(10);
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)
-        ));
+                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
         return field;
     }
 
@@ -181,8 +179,7 @@ public class PanelRepuesto extends JPanel {
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
                 new Font("Segoe UI", Font.BOLD, 13),
-                new Color(70, 70, 70)
-        );
+                new Color(70, 70, 70));
         return border;
     }
 
@@ -246,13 +243,17 @@ public class PanelRepuesto extends JPanel {
         r.setMarca(txtMarca.getText());
         r.setModeloCompatible(txtModelo.getText());
 
-        // Usa datePickerVidaUtil en lugar de datePicker
+        try {
+            r.setPrecio(Integer.parseInt(txtPrecio.getText()));
+        } catch (NumberFormatException e) {
+            r.setPrecio(0); // Valor por defecto si no se puede parsear
+        }
+
         if (datePickerVidaUtil.getModel().isSelected()) {
             LocalDate localDate = LocalDate.of(
                     datePickerVidaUtil.getModel().getYear(),
                     datePickerVidaUtil.getModel().getMonth() + 1,
-                    datePickerVidaUtil.getModel().getDay()
-            );
+                    datePickerVidaUtil.getModel().getDay());
             r.setVidaUtilEstimada(java.sql.Date.valueOf(localDate));
         } else {
             r.setVidaUtilEstimada(null);
@@ -263,8 +264,13 @@ public class PanelRepuesto extends JPanel {
 
     public Lote getDatosFormularioLote() {
         Lote r = new Lote();
-        r.setIdrepuesto(Integer.valueOf(txtIdRepuesto.getText()));
-        r.setIdproveedor(Integer.valueOf(txtIdProveedor.getText()));
+        Repuesto repuesto = new Repuesto();
+        Proveedor proveedor = new Proveedor();
+
+        repuesto.setId(Integer.valueOf(txtIdRepuesto.getText()));
+        proveedor.setId(Integer.valueOf(txtIdProveedor.getText()));
+        r.setIdrepuesto(repuesto);
+        r.setIdproveedor(proveedor);
 
         if (datePickerFechaIngreso.getModel().isSelected()) {
             Calendar cal = Calendar.getInstance();
@@ -292,12 +298,12 @@ public class PanelRepuesto extends JPanel {
         txtTipo.setSelectedIndex(0);
         txtMarca.setText("");
         txtModelo.setText("");
+        txtPrecio.setText("");
 
         // Limpiar el datePicker correctamente
         datePickerVidaUtil.getModel().setValue(null);
         datePickerVidaUtil.getModel().setSelected(false);
         datePickerVidaUtil.getJFormattedTextField().setText("");
-
 
         datePickerFechaIngreso.getModel().setValue(null);
         datePickerFechaIngreso.getModel().setSelected(false);
@@ -324,6 +330,7 @@ public class PanelRepuesto extends JPanel {
         txtTipo.setSelectedItem(repuesto.getTipo().toString().toLowerCase());
         txtMarca.setText(repuesto.getMarca());
         txtModelo.setText(repuesto.getModeloCompatible());
+        txtPrecio.setText(String.valueOf(repuesto.getPrecio()));
 
         // Manejo seguro de la fecha
         if (repuesto.getVidaUtilEstimada() != null) {
@@ -332,8 +339,7 @@ public class PanelRepuesto extends JPanel {
             datePickerVidaUtil.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)
-            );
+                    cal.get(Calendar.DAY_OF_MONTH));
             datePickerVidaUtil.getModel().setSelected(true);
         } else {
             datePickerVidaUtil.getModel().setValue(null);
@@ -350,8 +356,7 @@ public class PanelRepuesto extends JPanel {
             datePickerFechaIngreso.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)
-            );
+                    cal.get(Calendar.DAY_OF_MONTH));
             datePickerFechaIngreso.getModel().setSelected(true);
         } else {
             datePickerFechaIngreso.getModel().setValue(null);

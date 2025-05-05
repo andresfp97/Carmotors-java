@@ -25,19 +25,21 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
 
     @Override
     public boolean agregar(Repuesto repuesto) {
-        String sql = "insert into repuesto (nombre_repuesto, tipo_repuesto, marca, modelo_compatible, vida_util_estimada) values (?,?,?,?,?)";
+        String sql = "insert into repuesto (nombre_repuesto, tipo_repuesto, marca, modelo_compatible, vida_util_estimada, precio) values (?,?,?,?,?,?)";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, repuesto.getNombre());
             pstmt.setString(2, repuesto.getTipo().name());
             pstmt.setString(3, repuesto.getMarca());
             pstmt.setString(4, repuesto.getModeloCompatible());
+            
 
             if (repuesto.getVidaUtilEstimada() != null) {
                 pstmt.setDate(5, new Date(repuesto.getVidaUtilEstimada().getTime()));
             } else {
                 pstmt.setNull(5, java.sql.Types.DATE);
             }
+            pstmt.setInt(6, repuesto.getPrecio());
 
             pstmt.executeUpdate();
             return true;  // ← Añadido: retorno exitoso

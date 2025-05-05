@@ -10,17 +10,13 @@ import java.util.List;
 
 public class ClienteDAO implements CrudDAO<Cliente> {
 
-    private Connection con;
-
-    public ClienteDAO() {
-        con = Conexion.getConexion().getConnection();
-    }
-
     @Override
     public boolean agregar(Cliente cliente) {
         String sql = "INSERT INTO cliente (nombre, identificacion, telefono, correo_electronico) VALUES (?,?,?,?)";
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+            Connection con = Conexion.getConexion().getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, cliente.getNombre());
             pstmt.setString(2, cliente.getIdentificacion());
             pstmt.setString(3, cliente.getTelefono());
@@ -45,11 +41,36 @@ public class ClienteDAO implements CrudDAO<Cliente> {
         }
     }
 
+    public Cliente obtenerPorId(int id) {
+        String sql = "SELECT id_cliente, nombre, identificacion, telefono, correo_electronico FROM cliente WHERE id_cliente = ?";
+        Cliente cliente = null;
+        
+        try (Connection con = Conexion.getConexion().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                cliente = new Cliente();
+                cliente.setId(rs.getInt("id_cliente"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setIdentificacion(rs.getString("identificacion"));
+                cliente.setCorreoElectronico(rs.getString("correo_electronico"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener cliente por ID: " + e.getMessage());
+        }
+        return cliente;
+    }
+
     public Cliente obtenerPorId(Integer id) {
         String sql = "SELECT * FROM cliente WHERE id_cliente = ?";
         Cliente cliente = null;
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (
+            Connection con = Conexion.getConexion().getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 

@@ -1,20 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.carmotors.view;
 
 import javax.swing.*;
 import java.awt.*;
-
 import java.util.Objects;
 import com.carmotors.controller.*;
 import com.carmotors.model.Cliente;
 import com.carmotors.model.DetalleTrabajoRepuesto;
-
-
-import com.carmotors.controller.*;
-
 import com.carmotors.model.Proveedor;
 import com.carmotors.modelDAO.*;
 
@@ -28,26 +19,24 @@ public class VentanaPrincipal extends JFrame {
     private PanelVehiculo panelVehiculo;
     private PanelServicio panelServicio;
     private PanelTrabajo panelTrabajo;
-    private PanelDetalleTrabajoRepuesto panelDetalleTrabajo; // Nuevo panel agregado
-
+    private PanelDetalleTrabajoRepuesto panelDetalleTrabajo;
     private Runnable actualizarCallback;
     private ClienteController clienteController;
     private ProveedorController proveedorController;
-
     private PanelActividadEspecial panelActividadEspecial;
-
     private PanelClienteActividad panelClienteActividad;
-
+    private PanelFactura panelFactura;
     private PanelEvaluacionProveedor panelEvaluacionProveedor;
     private final int MIN_MENU_WIDTH = 250;
 
     public VentanaPrincipal(RepuestoDAO repuestoDAO, ProveedorDAO proveedorDAO,
-                            ClienteDAO clienteDAO, LoteDAO loteDAO,
-                            VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
-                            ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
-                            DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
-                            ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
-                            EvaluacionProveedorDAO evaluacionProveedorDAO) { // Nuevo DAO agregado
+            ClienteDAO clienteDAO, LoteDAO loteDAO,
+            VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
+            ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
+            DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
+            ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
+            EvaluacionProveedorDAO evaluacionProveedorDAO, FacturaDAO facturaDAO,
+            DetalleFacturaDAO detalleFacturaDAO) {
 
         setTitle("Sistema de Gestión de Repuestos y Proveedores");
         setSize(1200, 700);
@@ -61,8 +50,7 @@ public class VentanaPrincipal extends JFrame {
                 vehiculoDAO, actualizarCallback, servicioDAO,
                 trabajoDAO, detalleTrabajoDAO,
                 actividadEspecialDAO, clienteActividadDAO,
-                evaluacionProveedorDAO);
-
+                evaluacionProveedorDAO, facturaDAO, detalleFacturaDAO);
     }
 
     private void initComponents() {
@@ -81,11 +69,11 @@ public class VentanaPrincipal extends JFrame {
         panelVehiculo = new PanelVehiculo();
         panelServicio = new PanelServicio();
         panelTrabajo = new PanelTrabajo();
-        panelDetalleTrabajo = new PanelDetalleTrabajoRepuesto(); // Nuevo panel inicializado
+        panelDetalleTrabajo = new PanelDetalleTrabajoRepuesto();
         panelActividadEspecial = new PanelActividadEspecial();
         panelClienteActividad = new PanelClienteActividad();
         panelEvaluacionProveedor = new PanelEvaluacionProveedor();
-
+        panelFactura = new PanelFactura(); // Initialize panelFactura first
 
         // Agregar paneles al cardLayout
         panelDerecho.add(panelRepuesto, "Repuestos");
@@ -94,11 +82,11 @@ public class VentanaPrincipal extends JFrame {
         panelDerecho.add(panelVehiculo, "Vehiculo");
         panelDerecho.add(panelServicio, "Servicios");
         panelDerecho.add(panelTrabajo, "Trabajos");
-        panelDerecho.add(panelDetalleTrabajo, "DetallesTrabajo"); // Nuevo panel agregado
+        panelDerecho.add(panelDetalleTrabajo, "DetallesTrabajo");
         panelDerecho.add(panelActividadEspecial, "Actividades Especiales");
         panelDerecho.add(panelClienteActividad, "Cliente Actividad");
         panelDerecho.add(panelEvaluacionProveedor, "Evaluacion Proveedor");
-
+        panelDerecho.add(panelFactura, "Factura");
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelIzquierdo, panelDerecho);
         splitPane.setDividerSize(5);
@@ -109,14 +97,13 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void initControllers(RepuestoDAO repuestoDao, ProveedorDAO proveedorDao,
-                                 ClienteDAO clienteDao, LoteDAO loteDao,
-                                 VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
-                                 ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
-                                 DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
-                                 ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
-                                 EvaluacionProveedorDAO evaluacionProveedorDAO
-                                 ) { // Nuevo parámetro
-
+            ClienteDAO clienteDao, LoteDAO loteDao,
+            VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
+            ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
+            DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
+            ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
+            EvaluacionProveedorDAO evaluacionProveedorDAO, FacturaDAO facturaDAO,
+            DetalleFacturaDAO detalleFacturaDAO) {
 
         new RepuestoController(panelRepuesto, repuestoDao);
         new ProveedorController(panelProveedor, proveedorDao);
@@ -125,12 +112,32 @@ public class VentanaPrincipal extends JFrame {
         new VehiculoController(panelVehiculo, vehiculoDAO, clienteDao);
         new ServicioController(panelServicio, servicioDAO);
         new TrabajoController(panelTrabajo, trabajoDAO, vehiculoDAO, servicioDAO);
-
-        // Nuevo controlador para el panel de detalles
         new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO, loteDao, trabajoDAO);
         new ActividadEspecialController(panelActividadEspecial, actividadEspecialDAO);
         new ClienteActividadController(panelClienteActividad, clienteActividadDAO);
         new EvaluacionProveedorController(panelEvaluacionProveedor, evaluacionProveedorDAO, proveedorDao);
+
+        // Initialize FacturaController and set the listener for "Generar Factura"
+        // Inicializar FacturaController
+        FacturaController facturaController = new FacturaController(
+                panelFactura,
+                facturaDAO,
+                detalleFacturaDAO, // Usar el parámetro recibido
+                clienteDao, // Usar clienteDao (el parámetro recibido)
+                trabajoDAO,
+                vehiculoDAO);
+
+        // Configurar el panel
+        panelFactura.setFacturaController(facturaController);
+        panelFactura.setTrabajoDAO(trabajoDAO);
+
+        // Cargar trabajos facturables
+        facturaController.cargarTrabajosFacturables();
+
+        // Configurar listener (opcional, puede hacerse en el constructor del
+        // controlador)
+
+        panelFactura.setGenerarFacturaListener(e -> facturaController.generarFacturaDesdeVista());
     }
 
     private void crearBotonesMenu() {
@@ -141,12 +148,11 @@ public class VentanaPrincipal extends JFrame {
         JButton btnServicios = crearBotonMenu("Servicios", "Servicios");
         JButton btnTrabajos = crearBotonMenu("Trabajos", "Trabajos");
         JButton btnEvaluacion = crearBotonMenu("Evaluacion Proveedor", "Evaluacion Proveedor");
+        JButton btnFactura = crearBotonMenu("Factura", "Factura");
 
-        // Nuevo botón para detalles de trabajo
         JButton btnDetallesTrabajo = crearBotonMenu("Detalles Trabajo", "DetallesTrabajo");
         JButton btnActividades = new JButton("Actividades Especiales");
-        JButton btnClienteActividad= new JButton("Cliente Actividad");
-
+        JButton btnClienteActividad = new JButton("Cliente Actividad");
 
         btnRepuestos.setForeground(Color.WHITE);
         btnProveedores.setForeground(Color.WHITE);
@@ -154,6 +160,7 @@ public class VentanaPrincipal extends JFrame {
         btnActividades.setForeground(Color.WHITE);
         btnClienteActividad.setBackground(Color.WHITE);
         btnEvaluacion.setBackground(Color.WHITE);
+        btnFactura.setBackground(Color.WHITE);
 
         btnRepuestos.setBackground(new Color(25, 20, 20));
         btnProveedores.setBackground(new Color(25, 20, 20));
@@ -161,6 +168,7 @@ public class VentanaPrincipal extends JFrame {
         btnActividades.setBackground(new Color(25, 20, 20));
         btnClienteActividad.setBackground(new Color(25, 20, 20));
         btnEvaluacion.setBackground(new Color(25, 20, 20));
+        btnFactura.setBackground(new Color(25, 20, 20));
 
         btnRepuestos.setBorderPainted(false);
         btnProveedores.setBorderPainted(false);
@@ -168,7 +176,7 @@ public class VentanaPrincipal extends JFrame {
         btnActividades.setBorderPainted(false);
         btnClienteActividad.setBorderPainted(false);
         btnEvaluacion.setBorderPainted(false);
-
+        btnFactura.setBorderPainted(false);
 
         btnRepuestos.addActionListener(e -> cardLayout.show(panelDerecho, "Repuestos"));
         btnProveedores.addActionListener(e -> cardLayout.show(panelDerecho, "Proveedores"));
@@ -176,7 +184,7 @@ public class VentanaPrincipal extends JFrame {
         btnActividades.addActionListener(e -> cardLayout.show(panelDerecho, "Actividades Especiales"));
         btnClienteActividad.addActionListener(e -> cardLayout.show(panelDerecho, "Cliente Actividad"));
         btnEvaluacion.addActionListener(e -> cardLayout.show(panelDerecho, "Evaluacion Proveedor"));
-
+        btnFactura.addActionListener(e -> cardLayout.show(panelDerecho, "Factura"));
 
         panelIzquierdo.add(btnRepuestos);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -196,7 +204,11 @@ public class VentanaPrincipal extends JFrame {
         panelIzquierdo.add(btnClienteActividad);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
         panelIzquierdo.add(btnEvaluacion);
-        panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));// Nuevo botón agregado
+        panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
+        panelIzquierdo.add(btnFactura);
+        // Remove duplicate button
+        // panelIzquierdo.add(btnFactura);
+        panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
     }
 
     private JButton crearBotonMenu(String texto, String comando) {
@@ -210,7 +222,6 @@ public class VentanaPrincipal extends JFrame {
         return boton;
     }
 
-    // Resto de métodos existentes (actualizarListaClientes, setActualizarCallback, etc.)
     public void actualizarListaClientes(java.util.List<Cliente> clientes) {
         if (panelVehiculo != null) {
             panelVehiculo.cargarClientes(clientes);

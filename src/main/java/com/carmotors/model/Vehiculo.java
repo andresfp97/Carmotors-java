@@ -15,6 +15,17 @@ public class Vehiculo {
     public Vehiculo() {
     }
 
+    public Vehiculo(Integer id, Cliente cliente, String marca, String modelo, String placa, String tipoVehiculo,
+            List<Trabajo> trabajos) {
+        this.id = id;
+        this.cliente = cliente;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.placa = placa;
+        this.tipoVehiculo = tipoVehiculo;
+        this.trabajos = trabajos;
+    }
+
     // Getters y Setters
     public Integer getId() {
         return id;
@@ -70,5 +81,15 @@ public class Vehiculo {
 
     public void setTrabajos(List<Trabajo> trabajos) {
         this.trabajos = trabajos;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehiculo [id=" + id + ", cliente=" + cliente + ", marca=" + marca + ", modelo=" + modelo + ", placa="
+                + placa + ", tipoVehiculo=" + tipoVehiculo + ", trabajos=" + trabajos + ", getId()=" + getId()
+                + ", getCliente()=" + getCliente() + ", getMarca()=" + getMarca() + ", getModelo()=" + getModelo()
+                + ", getPlaca()=" + getPlaca() + ", getTipoVehiculo()=" + getTipoVehiculo() + ", getTrabajos()="
+                + getTrabajos() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+                + super.toString() + "]";
     }
 }

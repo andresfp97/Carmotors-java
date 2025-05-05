@@ -191,4 +191,37 @@ public class TrabajoDAO {
         return trabajo;
     }
 
+    public List<Trabajo> obtenerTrabajosParaFacturar() {
+        List<Trabajo> trabajos = new ArrayList<>();
+        String sql = "SELECT * FROM trabajo WHERE id_trabajo NOT IN (SELECT id_trabajo FROM factura)";
+    
+        try (Connection conn = Conexion.getConexion().getConnection();  
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+    
+            while (rs.next()) {
+                Trabajo trabajo = new Trabajo();
+                trabajo.setIdTrabajo(rs.getInt("id_trabajo"));
+    
+                java.sql.Date fechaRecepcion = rs.getDate("fecha_recepcion");
+                if (fechaRecepcion != null) {
+                    trabajo.setFechaRecepcion(fechaRecepcion.toLocalDate());
+                }
+    
+                java.sql.Date fechaEntrega = rs.getDate("fecha_entrega");
+                if (fechaEntrega != null) {
+                    trabajo.setFechaEntrega(fechaEntrega.toLocalDate());
+                }
+    
+                trabajo.setTecnicoAsignado(rs.getString("tecnico_asignado"));
+                trabajo.setServicio(servicioDAO.obtenerPorId(rs.getInt("id_servicio")));
+                trabajo.setVehiculo(vehiculoDAO.obtenerPorId(rs.getInt("id_vehiculo")));
+    
+                trabajos.add(trabajo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return trabajos;
+    }
 }

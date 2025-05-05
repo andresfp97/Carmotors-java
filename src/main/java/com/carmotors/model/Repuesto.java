@@ -20,17 +20,19 @@ public class Repuesto {
     private String marca;
     private String modeloCompatible;
     private Date vidaUtilEstimada;
+    private Integer precio;
 
     public Repuesto() {
     }
 
-    public Repuesto(Integer id, String nombre, TipoRepuesto tipo, String marca, String modeloCompatible, Date vidaUtilEstimada) {
+    public Repuesto(Integer id, String nombre, TipoRepuesto tipo, String marca, String modeloCompatible, Date vidaUtilEstimada, Integer precio) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
         this.marca = marca;
         this.modeloCompatible = modeloCompatible;
         this.vidaUtilEstimada = vidaUtilEstimada;
+        this.precio = precio;
     }
 
     public Integer getId() {
@@ -94,6 +96,14 @@ public class Repuesto {
         Date tresMesesDespues = new Date(ahora.getTime() + (90L * 24 * 60 * 60 * 1000)); // 90 días
 
         return !vidaUtilEstimada.after(tresMesesDespues) && !vidaUtilEstimada.before(ahora);
+    }
+
+    public Integer getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Integer precio) {
+        this.precio = precio;
     }
 
     

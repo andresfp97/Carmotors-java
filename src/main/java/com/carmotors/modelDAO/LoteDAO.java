@@ -5,6 +5,8 @@
 package com.carmotors.modelDAO;
 
 import com.carmotors.model.Lote;
+import com.carmotors.model.Proveedor;
+import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.EstadoLote;
 import com.carmotors.util.Conexion;
 
@@ -28,8 +30,8 @@ public class LoteDAO implements CrudDAO<Lote> {
         String sql = "INSERT INTO lote (id_repuesto, id_proveedor, fecha_ingreso, cantidad_inicial, cantidad_disponible, estado) VALUES (?,?,?,?,?,?)";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setInt(1, lote.getIdrepuesto());
-            pstmt.setInt(2, lote.getIdproveedor());
+            pstmt.setInt(1, lote.getIdrepuesto().getId());
+            pstmt.setInt(2, lote.getIdproveedor().getId());
 
             if (lote.getFechaIngreso() != null) {
                 pstmt.setDate(3, new java.sql.Date(lote.getFechaIngreso().getTime()));
@@ -61,8 +63,12 @@ public class LoteDAO implements CrudDAO<Lote> {
             while (rs.next()) {
                 Lote lote = new Lote();
                 lote.setId(rs.getInt("id_lote"));
-                lote.setIdrepuesto(rs.getInt("id_repuesto"));
-                lote.setIdproveedor(rs.getInt("id_proveedor"));
+                Repuesto repuesto = new Repuesto();
+                repuesto.setId(rs.getInt("id_repuesto"));
+                lote.setIdrepuesto(repuesto);
+                Proveedor proveedor = new Proveedor();
+                proveedor.setId(rs.getInt("id_proveedor"));
+                lote.setIdproveedor(proveedor);
                 lote.setFechaIngreso(rs.getDate("fecha_ingreso"));
                 lote.setCantidadInicial(rs.getInt("cantidad_inicial"));
                 lote.setCantidadDisponible(rs.getInt("cantidad_disponible"));
@@ -138,8 +144,14 @@ public class LoteDAO implements CrudDAO<Lote> {
     private Lote mapearLote(ResultSet rs) throws SQLException {
         Lote lote = new Lote();
         lote.setId(rs.getInt("id_lote"));
-        lote.setIdrepuesto(rs.getInt("id_repuesto"));
-        lote.setIdproveedor(rs.getInt("id_proveedor"));
+
+        Repuesto repuesto = new Repuesto();
+        repuesto.setId(rs.getInt("id_repuesto"));
+        lote.setIdrepuesto(repuesto);
+
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(rs.getInt("id_proveedor"));
+        lote.setIdproveedor(proveedor);
         lote.setFechaIngreso(rs.getDate("fecha_ingreso"));
         lote.setCantidadInicial(rs.getInt("cantidad_inicial"));
         lote.setCantidadDisponible(rs.getInt("cantidad_disponible"));

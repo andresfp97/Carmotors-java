@@ -1,8 +1,7 @@
 package com.carmotors.modelDAO;
 
 import com.carmotors.model.Proveedor;
-import com.carmotors.model.Repuesto;
-import com.carmotors.model.Vehiculo;
+import com.carmotors.model.enums.FrecuenciaVisitas;
 import com.carmotors.util.Conexion;
 
 import java.sql.*;
@@ -23,7 +22,8 @@ public class ProveedorDAO implements CrudDAO<Proveedor> {
             pstmt.setString(1, proveedor.getNombre());
             pstmt.setString(2, proveedor.getNit());
             pstmt.setString(3, proveedor.getContacto());
-            pstmt.setInt(4, proveedor.getFrecuenciaVisitas());
+            pstmt.setString(4, proveedor.getFrecuenciaVisitas().getDescripcion());
+         
             pstmt.executeUpdate();
             return true;  // ← Única línea añadida (retorno exitoso)
 
@@ -49,7 +49,8 @@ public class ProveedorDAO implements CrudDAO<Proveedor> {
                 proveedor.setNombre(rs.getString("nombre"));
                 proveedor.setNit(rs.getString("NIT"));
                 proveedor.setContacto(rs.getString("contacto"));
-                proveedor.setFrecuenciaVisitas(rs.getInt("frecuencia_visitas"));
+                proveedor.setFrecuenciaVisitas(FrecuenciaVisitas.fromString(rs.getString("frecuencia_visitas")));
+
 
             }
         } catch (SQLException e) {
@@ -74,7 +75,7 @@ public class ProveedorDAO implements CrudDAO<Proveedor> {
                 proveedor.setNombre(rs.getString("nombre"));
                 proveedor.setNit(rs.getString("NIT"));
                 proveedor.setContacto(rs.getString("contacto"));
-                proveedor.setFrecuenciaVisitas(rs.getInt("frecuencia_visitas"));
+                proveedor.setFrecuenciaVisitas(FrecuenciaVisitas.fromString(rs.getString("frecuencia_visitas")));
 
                 proveedores.add(proveedor);
             }
