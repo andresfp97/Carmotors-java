@@ -1,10 +1,12 @@
 package com.carmotors.view;
 
+import com.carmotors.model.Repuesto;
 import com.carmotors.model.Servicio;
 import com.carmotors.model.Vehiculo;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.List;
 
 public class PanelTrabajo extends JPanel {
     private JComboBox<Vehiculo> cbVehiculos;
@@ -158,5 +160,20 @@ public class PanelTrabajo extends JPanel {
 
     public String getTecnico() {
         return txtTecnico.getText();
+    }
+
+    public List<Repuesto> getRepuestosSeleccionados() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getRepuestosSeleccionados'");
+    }
+
+    public void cargarRepuestos(List<Repuesto> repuestos) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'cargarRepuestos'");
+    }
+
+    public void cargarRepuestosDisponibles(List<Repuesto> repuestos) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'cargarRepuestosDisponibles'");
     }
 }

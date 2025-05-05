@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
 public class DetalleTrabajoRepuestoDAO {
     private static final Logger LOGGER = Logger.getLogger(DetalleTrabajoRepuestoDAO.class.getName());
     
@@ -24,54 +26,102 @@ public class DetalleTrabajoRepuestoDAO {
 
     // Método para agregar un nuevo detalle
     public boolean agregarDetalle(DetalleTrabajoRepuesto detalle) {
-        String sql = "INSERT INTO detalle_trabajo_repuesto (id_trabajo, id_lote, cantidad_usada) VALUES (?, ?, ?)";
+    Connection con = null;
+    try {
+        con = Conexion.getConexion().getConnection();
+        con.setAutoCommit(false); // Iniciar transacción
 
-        try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        // 1. Validar datos antes de insertar
+        if (detalle.getTrabajo() == null || detalle.getLote() == null || detalle.getCantidadUsada() == null || 
+            detalle.getCantidadUsada() <= 0) {
+            throw new IllegalArgumentException("Datos del detalle inválidos");
+        }
+
+        // 2. Verificar stock disponible
+        if (!verificarStockDisponible(con, detalle.getLote().getId(), detalle.getCantidadUsada())) {
+            throw new SQLException("No hay suficiente stock disponible");
+        }
+
+        // 3. Insertar detalle
+        String sql = "INSERT INTO detalle_trabajo_repuesto (id_trabajo, id_lote, cantidad_usada) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, detalle.getTrabajo().getIdTrabajo());
             pstmt.setInt(2, detalle.getLote().getId());
             pstmt.setInt(3, detalle.getCantidadUsada());
 
-            LOGGER.log(Level.INFO, "Agregando detalle: Trabajo #{0}, Lote #{1}, Cantidad {2}", 
-                      new Object[]{detalle.getTrabajo().getIdTrabajo(), detalle.getLote().getId(), detalle.getCantidadUsada()});
-            
             int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("No se pudo insertar el detalle");
+            }
 
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        detalle.setIdDetalle(generatedKeys.getInt(1));
-                        actualizarStockLote(detalle.getLote(), detalle.getCantidadUsada());
-                        LOGGER.log(Level.INFO, "Detalle agregado exitosamente con ID: {0}", detalle.getIdDetalle());
-                        return true;
-                    }
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    detalle.setIdDetalle(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("No se obtuvo ID generado");
                 }
             }
-            LOGGER.log(Level.WARNING, "No se pudo agregar el detalle");
-            return false;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al agregar detalle: {0}", e.getMessage());
-            e.printStackTrace();
-            return false;
+        }
+
+        // 4. Actualizar stock
+        actualizarStockLote(con, detalle.getLote(), detalle.getCantidadUsada());
+
+        con.commit(); // Confirmar transacción
+        LOGGER.log(Level.INFO, "Detalle agregado exitosamente con ID: {0}", detalle.getIdDetalle());
+        return true;
+
+    } catch (Exception e) {
+        if (con != null) {
+            try {
+                con.rollback(); // Revertir en caso de error
+            } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "Error al hacer rollback", ex);
+            }
+        }
+        LOGGER.log(Level.SEVERE, "Error al agregar detalle: " + e.getMessage(), e);
+        JOptionPane.showMessageDialog(null, 
+            "Error al guardar detalle: " + e.getMessage(), 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
+    } finally {
+        if (con != null) {
+            try {
+                con.setAutoCommit(true); // Restaurar auto-commit
+                con.close();
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Error al cerrar conexión", e);
+            }
         }
     }
+}
+
 
     // Método para actualizar el stock del lote
-    private void actualizarStockLote(Lote lote, Integer cantidadUsada) throws SQLException {
-        String sql = "UPDATE lote SET cantidad_disponible = cantidad_disponible - ? WHERE id_lote = ?";
-
-        try (
-            Connection con = Conexion.getConexion().getConnection();
-            PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setInt(1, cantidadUsada);
-            pstmt.setInt(2, lote.getId());
-            pstmt.executeUpdate();
-            LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}, cantidad reducida: {1}", 
-                      new Object[]{lote.getId(), cantidadUsada});
+    private boolean verificarStockDisponible(Connection con, int idLote, int cantidad) throws SQLException {
+        String sql = "SELECT cantidad_disponible FROM lote WHERE id_lote = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, idLote);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cantidad_disponible") >= cantidad;
+                }
+                return false;
+            }
         }
     }
-
+    
+    private void actualizarStockLote(Connection con, Lote lote, int cantidadUsada) throws SQLException {
+        String sql = "UPDATE lote SET cantidad_disponible = cantidad_disponible - ? WHERE id_lote = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, cantidadUsada);
+            pstmt.setInt(2, lote.getId());
+            int affected = pstmt.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("No se pudo actualizar el stock del lote");
+            }
+            LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}", lote.getId());
+        }
+    }
     // Método para obtener detalles por trabajo
     public List<DetalleTrabajoRepuesto> obtenerPorTrabajo(Trabajo trabajo) {
         List<DetalleTrabajoRepuesto> detalles = new ArrayList<>();

@@ -9,6 +9,7 @@ import com.carmotors.util.Conexion;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,9 +17,10 @@ import java.util.List;
  */
 public class RepuestoDAO implements CrudDAO<Repuesto> {
     private Connection con;
-
+    List<Repuesto> repuestos;
     public RepuestoDAO() {
         con = Conexion.getConexion().getConnection();
+        repuestos = new ArrayList<>();
     }
 
     @Override
@@ -67,6 +69,30 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
                 // Podrías crear una subclase si necesitas mostrar el estado
                 repuestos.add(repuesto);
             }
+        }
+        return repuestos;
+    }
+
+    public List<Repuesto> obtenerTodos() {
+        List<Repuesto> repuestos = new ArrayList<>();
+        String sql = "SELECT * FROM repuestos";
+        try (
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Repuesto repuesto = new Repuesto();
+                repuesto.setId(rs.getInt("id"));
+                repuesto.setNombre(rs.getString("nombre"));
+                repuesto.setVidaUtilEstimada(rs.getDate("vida_util_estimada"));
+                // ... otros campos
+
+                // Podrías crear una subclase si necesitas mostrar el estado
+                repuestos.add(repuesto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
         return repuestos;
     }

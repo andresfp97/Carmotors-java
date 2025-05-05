@@ -17,6 +17,7 @@ public class TrabajoController {
     private final TrabajoDAO trabajoDAO;
     private final VehiculoDAO vehiculoDAO;
     private final ServicioDAO servicioDAO;
+        
 
     public TrabajoController(PanelTrabajo vista, TrabajoDAO trabajoDAO,
                              VehiculoDAO vehiculoDAO, ServicioDAO servicioDAO) {
