@@ -4,6 +4,8 @@ import com.carmotors.model.enums.EstadoLote;
 import com.carmotors.model.Lote;
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.TipoRepuesto;
+import com.carmotors.modelDAO.LoteDAO;
+import com.carmotors.modelDAO.RepuestoDAO;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 
@@ -14,37 +16,191 @@ import java.util.Calendar;
 import java.util.Properties;
 
 
-
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PanelRepuesto extends JPanel {
+
     private JTextField txtNombre, txtMarca, txtModelo, txtIdRepuesto, txtIdProveedor,
-            txtCatidadInicial, txtCatidadDisponible;
-    private JButton btnGuardar, btnGuardarLote;
+            txtCatidadInicial, txtCatidadDisponible, txtBuscarRepuesto, txtBuscarLote, txtPrecio;
+    private JButton btnGuardar, btnGuardarLote, btnBuscarRepuesto, btnEliminarRepuesto, btnBuscarLote, btnEliminarLote, btnLimpiarBusquedaRepuesto, btnLimpiarBusquedaLote;
     private JComboBox<String> txtEstado, txtTipo;
     private JDatePickerImpl datePickerVidaUtil, datePickerFechaIngreso;
+    private JTable tablaRepuestos, tablaLotes;
+    private DefaultTableModel modeloTablaRepuestos, modeloTablaLotes;
+    private RepuestoDAO repuestoDAO = new RepuestoDAO();
+    private LoteDAO loteDAO = new LoteDAO();
 
     public PanelRepuesto() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
         setBackground(new Color(240, 240, 240));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         initComponents();
+        initListeners();
+        cargarTablaRepuestos();
+        cargarTablaLotes();
+    }
+
+    private void cargarTablaRepuestos() {
+        modeloTablaRepuestos.setRowCount(0);
+        for (Repuesto r : repuestoDAO.obtenerTodos()) {
+            modeloTablaRepuestos.addRow(new Object[]{r.getId(), r.getNombre(), r.getTipo(), r.getMarca(), r.getModeloCompatible(), r.getVidaUtilEstimada(), r.getPrecio()});
+        }
+    }
+
+    private void cargarTablaLotes() {
+        modeloTablaLotes.setRowCount(0);
+        for (Lote l : loteDAO.obtenerTodos()) {
+            modeloTablaLotes.addRow(new Object[]{l.getIdrepuesto(), l.getIdproveedor(), l.getFechaIngreso(), l.getCantidadInicial(), l.getCantidadDisponible(), l.getEstado()});
+        }
+    }
+
+    private void initListeners() {
+        // Listener para buscar repuesto
+        btnBuscarRepuesto.addActionListener(e -> {
+            String idTexto = txtBuscarRepuesto.getText().trim();
+
+            if (idTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un ID de repuesto", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                Integer id = Integer.parseInt(idTexto);
+                Repuesto r = repuestoDAO.buscarPorId(id);
+
+                modeloTablaRepuestos.setRowCount(0);
+                if (r != null) {
+                    modeloTablaRepuestos.addRow(new Object[]{
+                            r.getId(),
+                            r.getNombre(),
+                            r.getTipo(),
+                            r.getMarca(),
+                            r.getModeloCompatible(),
+                            r.getVidaUtilEstimada()
+                    });
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró un repuesto con ese ID", "No encontrado", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "El ID debe ser un número válido", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Listener para eliminar repuesto
+        btnEliminarRepuesto.addActionListener(e -> {
+            String idTexto = txtBuscarRepuesto.getText().trim();
+
+            if (idTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un ID de repuesto", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                Integer id = Integer.parseInt(idTexto);
+                int confirmacion = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro que desea eliminar este repuesto?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    String resultadoEliminacion = repuestoDAO.eliminarPorId(id); // Recibir el mensaje de resultado
+                    cargarTablaRepuestos();
+                    JOptionPane.showMessageDialog(this, resultadoEliminacion, "Resultado de eliminación", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "El ID debe ser un número válido", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Listener para buscar lote
+        btnBuscarLote.addActionListener(e -> {
+            String idTexto = txtBuscarLote.getText().trim();
+
+            if (idTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un ID de lote", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                Integer id = Integer.parseInt(idTexto);
+                Lote l = loteDAO.buscarPorId(id);
+
+                modeloTablaLotes.setRowCount(0);
+                if (l != null) {
+                    modeloTablaLotes.addRow(new Object[]{
+                            l.getIdrepuesto(),
+                            l.getIdproveedor(),
+                            l.getFechaIngreso(),
+                            l.getCantidadInicial(),
+                            l.getCantidadDisponible(),
+                            l.getEstado()
+                    });
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró un lote con ese ID", "No encontrado", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "El ID debe ser un número válido", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Listener para eliminar lote
+        btnEliminarLote.addActionListener(e -> {
+            String idTexto = txtBuscarLote.getText().trim();
+
+            if (idTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor ingrese un ID de lote", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                Integer id = Integer.parseInt(idTexto);
+                int confirmacion = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Está seguro que desea eliminar este lote?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    String resultadoEliminacion = loteDAO.eliminarPorId(id); // Asumiendo que tienes este método en LoteDAO
+                    cargarTablaLotes();
+                    JOptionPane.showMessageDialog(this, resultadoEliminacion, "Resultado de eliminación", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "El ID debe ser un número válido", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        btnLimpiarBusquedaLote.addActionListener(e -> {
+            txtBuscarLote.setText("");
+            cargarTablaLotes();
+        });
+
+        btnLimpiarBusquedaRepuesto.addActionListener(e -> {
+            txtBuscarRepuesto.setText("");
+            cargarTablaRepuestos();
+        });
     }
 
     private void initComponents() {
-        // ===== PANEL SUPERIOR =====
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        // ======================= TAB 1: REGISTRAR REPUESTO =======================
+        JPanel tabRepuesto = new JPanel();
+        tabRepuesto.setLayout(new BorderLayout());
+        tabRepuesto.setBackground(new Color(240, 240, 240));
+
         JPanel panelSuperior = new JPanel();
         panelSuperior.setLayout(new BoxLayout(panelSuperior, BoxLayout.Y_AXIS));
-        panelSuperior.setBackground(new Color(255, 255, 255));
+        panelSuperior.setBackground(Color.WHITE);
         panelSuperior.setBorder(createStyledBorder("Registrar Repuesto"));
 
-        // Formulario superior
         JPanel formSuperior = new JPanel(new GridBagLayout());
         formSuperior.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -52,46 +208,70 @@ public class PanelRepuesto extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Componentes del formulario
         addFormRow(formSuperior, gbc, 0, "Nombre:", txtNombre = createStyledTextField(15));
         addFormRow(formSuperior, gbc, 1, "Tipo:", txtTipo = createStyledComboBox(new String[]{"Mecanico", "Electrico", "Carroceria", "Consumo"}));
         addFormRow(formSuperior, gbc, 2, "Marca:", txtMarca = createStyledTextField(15));
         addFormRow(formSuperior, gbc, 3, "Modelo Compatible:", txtModelo = createStyledTextField(15));
+        addFormRow(formSuperior, gbc, 4, "Precio:", txtPrecio = createStyledTextField(15));
 
-        // Selector de fechas para Vida Útil Estimada
         UtilDateModel model = new UtilDateModel();
         Properties p = new Properties();
         p.put("text.today", "Hoy");
         p.put("text.month", "Mes");
         p.put("text.year", "Año");
-
         JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
         datePickerVidaUtil = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         JPanel datePanelWrapper = new JPanel(new BorderLayout());
         datePanelWrapper.setBackground(Color.WHITE);
         datePanelWrapper.add(datePickerVidaUtil, BorderLayout.WEST);
-        addFormRow(formSuperior, gbc, 4, "Vida Útil Estimada:", datePanelWrapper);
+        addFormRow(formSuperior, gbc, 5, "Vida Útil Estimada:", datePanelWrapper);
 
         panelSuperior.add(formSuperior);
 
-        // Botón Guardar dentro del panel superior
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(Color.WHITE);
         btnGuardar = createStyledButton("Guardar Repuesto", new Color(76, 175, 80));
         buttonPanel.add(btnGuardar);
-
         panelSuperior.add(Box.createRigidArea(new Dimension(0, 10)));
         panelSuperior.add(buttonPanel);
 
-        add(panelSuperior);
+        tabRepuesto.add(panelSuperior, BorderLayout.NORTH);
 
-        // ===== PANEL INFERIOR =====
+        // Sección tabla repuestos
+        JPanel panelTablaRepuestos = new JPanel(new BorderLayout());
+        panelTablaRepuestos.setBorder(createStyledBorder("Registros de Repuestos"));
+        panelTablaRepuestos.setBackground(Color.WHITE);
+
+        JPanel buscarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buscarPanel.setBackground(Color.WHITE);
+        buscarPanel.add(new JLabel("Buscar por ID:"));
+        txtBuscarRepuesto = createStyledTextField(10);
+        buscarPanel.add(txtBuscarRepuesto);
+        btnBuscarRepuesto = createStyledButton("Buscar", new Color(33, 150, 243));
+        btnEliminarRepuesto = createStyledButton("Eliminar", new Color(244, 67, 54));
+        btnLimpiarBusquedaRepuesto = createStyledButton("Limpiar busqueda", new Color(54, 243, 101));
+        buscarPanel.add(btnBuscarRepuesto);
+        buscarPanel.add(btnEliminarRepuesto);
+        buscarPanel.add(btnLimpiarBusquedaRepuesto);
+
+        panelTablaRepuestos.add(buscarPanel, BorderLayout.NORTH);
+
+        modeloTablaRepuestos = new DefaultTableModel(new Object[]{"ID", "Nombre", "Tipo", "Marca", "Modelo", "Vida Útil", "Precio"}, 0);
+        tablaRepuestos = new JTable(modeloTablaRepuestos);
+        panelTablaRepuestos.add(new JScrollPane(tablaRepuestos), BorderLayout.CENTER);
+
+        tabRepuesto.add(panelTablaRepuestos, BorderLayout.CENTER);
+
+        // ======================= TAB 2: REGISTRO DE LOTE =======================
+        JPanel tabLote = new JPanel();
+        tabLote.setLayout(new BorderLayout());
+        tabLote.setBackground(new Color(240, 240, 240));
+
         JPanel panelInferior = new JPanel();
         panelInferior.setLayout(new BoxLayout(panelInferior, BoxLayout.Y_AXIS));
-        panelInferior.setBackground(new Color(255, 255, 255));
+        panelInferior.setBackground(Color.WHITE);
         panelInferior.setBorder(createStyledBorder("Registro de Lote"));
 
-        // Formulario inferior
         JPanel formInferior = new JPanel(new GridBagLayout());
         formInferior.setBackground(Color.WHITE);
 
@@ -103,13 +283,11 @@ public class PanelRepuesto extends JPanel {
         p2.put("text.today", "Hoy");
         p2.put("text.month", "Mes");
         p2.put("text.year", "Año");
-
         JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p2);
         datePickerFechaIngreso = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
         JPanel datePanelWrapper2 = new JPanel(new BorderLayout());
         datePanelWrapper2.setBackground(Color.WHITE);
         datePanelWrapper2.add(datePickerFechaIngreso, BorderLayout.WEST);
-
         addFormRow(formInferior, gbc, 2, "Fecha Ingreso:", datePanelWrapper2);
         addFormRow(formInferior, gbc, 3, "Cantidad Inicial:", txtCatidadInicial = createStyledTextField(15));
         addFormRow(formInferior, gbc, 4, "Cantidad Disponible:", txtCatidadDisponible = createStyledTextField(15));
@@ -117,18 +295,45 @@ public class PanelRepuesto extends JPanel {
 
         panelInferior.add(formInferior);
 
-        // Botón Guardar Lote
         JPanel buttonPanelLote = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanelLote.setBackground(Color.WHITE);
-        btnGuardarLote = createStyledButton("Guardar Lote", new Color(33, 150, 243));
+        btnGuardarLote = createStyledButton("Guardar Lote", new Color(76, 175, 80));
         buttonPanelLote.add(btnGuardarLote);
-
         panelInferior.add(Box.createRigidArea(new Dimension(0, 10)));
         panelInferior.add(buttonPanelLote);
 
-        add(Box.createRigidArea(new Dimension(0, 15)));
-        add(panelInferior);
+        tabLote.add(panelInferior, BorderLayout.NORTH);
+
+        JPanel panelTablaLotes = new JPanel(new BorderLayout());
+        panelTablaLotes.setBorder(createStyledBorder("Registros de Lotes"));
+        panelTablaLotes.setBackground(Color.WHITE);
+
+        JPanel buscarPanelLote = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buscarPanelLote.setBackground(Color.WHITE);
+        buscarPanelLote.add(new JLabel("Buscar por ID:"));
+        txtBuscarLote = createStyledTextField(10);
+        buscarPanelLote.add(txtBuscarLote);
+        btnBuscarLote = createStyledButton("Buscar", new Color(33, 150, 243));
+        btnEliminarLote = createStyledButton("Eliminar", new Color(244, 67, 54));
+        btnLimpiarBusquedaLote = createStyledButton("Limpiar busqueda", new Color(54, 243, 101));
+        buscarPanelLote.add(btnBuscarLote);
+        buscarPanelLote.add(btnEliminarLote);
+        buscarPanelLote.add(btnLimpiarBusquedaLote);
+        panelTablaLotes.add(buscarPanelLote, BorderLayout.NORTH);
+
+        modeloTablaLotes = new DefaultTableModel(new Object[]{"ID Repuesto", "ID Proveedor", "Fecha Ingreso", "Cantidad", "Disponible", "Estado"}, 0);
+        tablaLotes = new JTable(modeloTablaLotes);
+        panelTablaLotes.add(new JScrollPane(tablaLotes), BorderLayout.CENTER);
+
+        tabLote.add(panelTablaLotes, BorderLayout.CENTER);
+
+        // Añadir pestañas
+        tabbedPane.addTab("Formulario Repuesto", tabRepuesto);
+        tabbedPane.addTab("Formulario Lote", tabLote);
+
+        add(tabbedPane, BorderLayout.CENTER);
     }
+
 
     // Métodos auxiliares para creación de componentes
     private JTextField createStyledTextField(int columns) {
@@ -240,11 +445,19 @@ public class PanelRepuesto extends JPanel {
         r.setNombre(txtNombre.getText());
 
         String tipoStr = (String) txtTipo.getSelectedItem();
-        TipoRepuesto tipoRepuesto = TipoRepuesto.valueOf(tipoStr.toUpperCase().replace(" ", "_"));
+        TipoRepuesto tipoRepuesto = TipoRepuesto.valueOf(tipoStr);
         r.setTipo(tipoRepuesto);
 
         r.setMarca(txtMarca.getText());
         r.setModeloCompatible(txtModelo.getText());
+
+        // Manejo del precio
+        try {
+            r.setPrecio(Double.parseDouble(txtPrecio.getText()));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Por favor ingrese un precio válido", "Error", JOptionPane.ERROR_MESSAGE);
+            throw e;
+        }
 
         // Usa datePickerVidaUtil en lugar de datePicker
         if (datePickerVidaUtil.getModel().isSelected()) {
@@ -279,9 +492,13 @@ public class PanelRepuesto extends JPanel {
         r.setCantidadInicial(Integer.valueOf(txtCatidadInicial.getText()));
         r.setCantidadDisponible(Integer.valueOf(txtCatidadDisponible.getText()));
 
+
+
         String estadoStr = (String) txtEstado.getSelectedItem();
         EstadoLote estado = EstadoLote.valueOf(estadoStr.toUpperCase().replace(" ", "_"));
         r.setEstado(estado);
+
+
 
         return r;
     }
@@ -292,6 +509,7 @@ public class PanelRepuesto extends JPanel {
         txtTipo.setSelectedIndex(0);
         txtMarca.setText("");
         txtModelo.setText("");
+        txtPrecio.setText("");
 
         // Limpiar el datePicker correctamente
         datePickerVidaUtil.getModel().setValue(null);
@@ -324,6 +542,7 @@ public class PanelRepuesto extends JPanel {
         txtTipo.setSelectedItem(repuesto.getTipo().toString().toLowerCase());
         txtMarca.setText(repuesto.getMarca());
         txtModelo.setText(repuesto.getModeloCompatible());
+        txtPrecio.setText(String.valueOf(repuesto.getPrecio())); // Nuevo campo
 
         // Manejo seguro de la fecha
         if (repuesto.getVidaUtilEstimada() != null) {

@@ -20,17 +20,19 @@ public class Repuesto {
     private String marca;
     private String modeloCompatible;
     private Date vidaUtilEstimada;
+    private double precio;
 
     public Repuesto() {
     }
 
-    public Repuesto(Integer id, String nombre, TipoRepuesto tipo, String marca, String modeloCompatible, Date vidaUtilEstimada) {
+    public Repuesto(Integer id, String nombre, TipoRepuesto tipo, String marca, String modeloCompatible, Date vidaUtilEstimada, double precio) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
         this.marca = marca;
         this.modeloCompatible = modeloCompatible;
         this.vidaUtilEstimada = vidaUtilEstimada;
+        this.precio = precio;
     }
 
     public Integer getId() {
@@ -81,11 +83,26 @@ public class Repuesto {
         this.vidaUtilEstimada = vidaUtilEstimada;
     }
 
-    @Override
-    public String toString() {
-        return "Repuesto{" + "id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", marca=" + marca + ", modeloCompatible=" + modeloCompatible + ", vidaUtilEstimada=" + vidaUtilEstimada + '}';
+    public double getPrecio() {
+        return precio;
     }
 
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    @Override
+    public String toString() {
+        return "Repuesto{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", tipo=" + tipo +
+                ", marca='" + marca + '\'' +
+                ", modeloCompatible='" + modeloCompatible + '\'' +
+                ", vidaUtilEstimada=" + vidaUtilEstimada +
+                ", precio=" + precio +
+                '}';
+    }
 
     public boolean estaPorVencer() {
         if (vidaUtilEstimada == null) return false;
