@@ -1,6 +1,9 @@
 package com.carmotors.modelDAO;
 
+import com.carmotors.model.Servicio;
 import com.carmotors.model.Trabajo;
+import com.carmotors.model.Vehiculo;
+import com.carmotors.model.enums.TipoMantenimiento;
 import com.carmotors.util.Conexion;
 
 import java.sql.Connection;
@@ -14,8 +17,8 @@ import java.util.List;
 
 public class TrabajoDAO {
 
-    private VehiculoDAO vehiculoDAO;
-    private ServicioDAO servicioDAO;
+    private final VehiculoDAO vehiculoDAO;
+    private final ServicioDAO servicioDAO;
 
     public TrabajoDAO() {
         this.vehiculoDAO = new VehiculoDAO();
@@ -26,7 +29,7 @@ public class TrabajoDAO {
         String sql = "INSERT INTO trabajo (id_vehiculo, id_servicio, fecha_recepcion, fecha_entrega, tecnico_asignado) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection con = Conexion.getConexion().getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             // Parámetros obligatorios
             pstmt.setInt(1, trabajo.getVehiculo().getId());
@@ -49,83 +52,48 @@ public class TrabajoDAO {
             return false;
         }
     }
-    
+
     /**
      * Obtiene todos los trabajos registrados en el sistema
+     * 
      * @return Lista de todos los trabajos
      */
-    public List<Trabajo> listarTrabajos() {
-        List<Trabajo> trabajos = new ArrayList<>();
-        String sql = "SELECT * FROM trabajo ORDER BY fecha_recepcion DESC";
-        
-        try (Connection con = Conexion.getConexion().getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            
-            while (rs.next()) {
-                Trabajo trabajo = new Trabajo();
-                trabajo.setIdTrabajo(rs.getInt("id_trabajo"));
-                
-                trabajo.setVehiculo(vehiculoDAO.obtenerPorId(rs.getInt("id_vehiculo")));
-                trabajo.setServicio(servicioDAO.obtenerPorId(rs.getInt("id_servicio")));
-                
-                // Convertir java.sql.Date a LocalDate
-                Date fechaRecepcion = rs.getDate("fecha_recepcion");
-                if (fechaRecepcion != null) {
-                    trabajo.setFechaRecepcion(fechaRecepcion.toLocalDate());
-                }
-                
-                Date fechaEntrega = rs.getDate("fecha_entrega");
-                if (fechaEntrega != null) {
-                    trabajo.setFechaEntrega(fechaEntrega.toLocalDate());
-                }
-                
-                trabajo.setTecnicoAsignado(rs.getString("tecnico_asignado"));
-                
-                trabajos.add(trabajo);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al listar trabajos: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return trabajos;
-    }
 
     /**
      * Obtiene un trabajo por su ID
+     * 
      * @param idTrabajo ID del trabajo a buscar
      * @return Objeto Trabajo encontrado o null si no existe
      */
     public Trabajo obtenerPorId(int idTrabajo) {
         String sql = "SELECT * FROM trabajo WHERE id_trabajo = ?";
-        
+
         try (Connection con = Conexion.getConexion().getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
-            
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
+
             pstmt.setInt(1, idTrabajo);
-            
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Trabajo trabajo = new Trabajo();
                     trabajo.setIdTrabajo(rs.getInt("id_trabajo"));
-                    
+
                     trabajo.setVehiculo(vehiculoDAO.obtenerPorId(rs.getInt("id_vehiculo")));
                     trabajo.setServicio(servicioDAO.obtenerPorId(rs.getInt("id_servicio")));
-                    
+
                     // Convertir java.sql.Date a LocalDate
                     Date fechaRecepcion = rs.getDate("fecha_recepcion");
                     if (fechaRecepcion != null) {
                         trabajo.setFechaRecepcion(fechaRecepcion.toLocalDate());
                     }
-                    
+
                     Date fechaEntrega = rs.getDate("fecha_entrega");
                     if (fechaEntrega != null) {
                         trabajo.setFechaEntrega(fechaEntrega.toLocalDate());
                     }
-                    
+
                     trabajo.setTecnicoAsignado(rs.getString("tecnico_asignado"));
-                    
+
                     return trabajo;
                 }
             }
@@ -133,7 +101,94 @@ public class TrabajoDAO {
             System.err.println("Error al obtener trabajo por ID: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return null;
     }
+
+    /*
+     * public List<Trabajo> listarTrabajos() {
+     * List<Trabajo> trabajos = new ArrayList<>();
+     * String sql = "SELECT t.*, v.marca, v.modelo, v.placa, " +
+     * "s.tipo_mantenimiento, s.descripcion as servicio_descripcion " +
+     * "FROM trabajo t " +
+     * "LEFT JOIN vehiculo v ON t.id_vehiculo = v.id_vehiculo " +
+     * "LEFT JOIN servicio s ON t.id_servicio = s.id_servicio " +
+     * "ORDER BY t.fecha_recepcion DESC";
+     * 
+     * try (Connection con = Conexion.getConexion().getConnection();
+     * PreparedStatement pstmt = con.prepareStatement(sql);
+     * ResultSet rs = pstmt.executeQuery()) {
+     * 
+     * while (rs.next()) {
+     * Trabajo trabajo = mapearTrabajoConJoins(rs);
+     * trabajos.add(trabajo);
+     * }
+     * } catch (SQLException e) {
+     * System.err.println("Error al listar trabajos: " + e.getMessage());
+     * e.printStackTrace();
+     * }
+     * 
+     * return trabajos;
+     * }
+     */
+    public List<Trabajo> listarTrabajos() {
+        List<Trabajo> trabajos = new ArrayList<>();
+        String sql = "SELECT t.*, v.marca, v.modelo, v.placa, " +
+                "s.tipo_mantenimiento, s.descripcion as servicio_descripcion " +
+                "FROM trabajo t " +
+                "LEFT JOIN vehiculo v ON t.id_vehiculo = v.id_vehiculo " +
+                "LEFT JOIN servicio s ON t.id_servicio = s.id_servicio " +
+                "ORDER BY t.fecha_recepcion DESC";
+
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Trabajo trabajo = mapearTrabajoConJoins(rs);
+                trabajos.add(trabajo);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar trabajos: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return trabajos;
+    }
+
+    private Trabajo mapearTrabajoConJoins(ResultSet rs) throws SQLException {
+        Trabajo trabajo = new Trabajo();
+        trabajo.setIdTrabajo(rs.getInt("id_trabajo"));
+
+        // Mapeo optimizado de vehículo
+        Vehiculo vehiculo = new Vehiculo();
+        vehiculo.setId(rs.getInt("id_vehiculo"));
+        vehiculo.setMarca(rs.getString("marca"));
+        vehiculo.setModelo(rs.getString("modelo"));
+        vehiculo.setPlaca(rs.getString("placa"));
+        trabajo.setVehiculo(vehiculo);
+
+        // Mapeo optimizado de servicio
+        Servicio servicio = new Servicio();
+        servicio.setIdServicio(rs.getInt("id_servicio"));
+        servicio.setTipoMantenimiento(TipoMantenimiento.fromString(rs.getString("tipo_mantenimiento")));
+        servicio.setDescripcion(rs.getString("servicio_descripcion"));
+        trabajo.setServicio(servicio);
+
+        // Fechas
+        Date fechaRecepcion = rs.getDate("fecha_recepcion");
+        if (fechaRecepcion != null) {
+            trabajo.setFechaRecepcion(fechaRecepcion.toLocalDate());
+        }
+
+        Date fechaEntrega = rs.getDate("fecha_entrega");
+        if (fechaEntrega != null) {
+            trabajo.setFechaEntrega(fechaEntrega.toLocalDate());
+        }
+
+        trabajo.setTecnicoAsignado(rs.getString("tecnico_asignado"));
+
+        return trabajo;
+    }
+
 }

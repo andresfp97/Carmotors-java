@@ -27,9 +27,9 @@ public class DetalleTrabajoRepuestoController {
     private Runnable actualizarCallback;
 
     public DetalleTrabajoRepuestoController(PanelDetalleTrabajoRepuesto vista,
-                                            DetalleTrabajoRepuestoDAO detalleDAO,
-                                            LoteDAO loteDAO,
-                                            TrabajoDAO trabajoDAO) {
+                                          DetalleTrabajoRepuestoDAO detalleDAO,
+                                          LoteDAO loteDAO,
+                                          TrabajoDAO trabajoDAO) {
         this.vista = Objects.requireNonNull(vista, "La vista no puede ser nula");
         this.detalleDAO = Objects.requireNonNull(detalleDAO, "El DAO de detalles no puede ser nulo");
         this.loteDAO = Objects.requireNonNull(loteDAO, "El DAO de lotes no puede ser nulo");
@@ -49,17 +49,27 @@ public class DetalleTrabajoRepuestoController {
     }
 
     private void inicializarVista() {
-        vista.limpiarFormulario();
-        cargarTodosLosTrabajos();
-        cargarLotesDisponibles();
+        try {
+            vista.limpiarFormulario();
+            cargarTodosLosTrabajos();
+            cargarLotesDisponibles();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al inicializar vista", e);
+            mostrarError("Error al inicializar: " + e.getMessage());
+        }
     }
     
     private void cargarTodosLosTrabajos() {
         LOGGER.log(Level.INFO, "Cargando todos los trabajos");
         try {
             List<Trabajo> trabajos = trabajoDAO.listarTrabajos();
-            vista.cargarTrabajos(trabajos);
-            LOGGER.log(Level.INFO, "Se cargaron {0} trabajos", trabajos.size());
+            if (trabajos != null) {
+                vista.cargarTrabajos(trabajos);
+                LOGGER.log(Level.INFO, "Se cargaron {0} trabajos", trabajos.size());
+            } else {
+                LOGGER.log(Level.WARNING, "La lista de trabajos es nula");
+                mostrarError("No se pudieron cargar los trabajos");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al cargar trabajos", e);
             mostrarError("Error al cargar trabajos: " + e.getMessage());
@@ -67,13 +77,18 @@ public class DetalleTrabajoRepuestoController {
     }
 
     private void seleccionarTrabajo(ActionEvent e) {
-        trabajoActual = vista.getTrabajoSeleccionado();
-        if (trabajoActual != null) {
-            LOGGER.log(Level.INFO, "Trabajo seleccionado: #{0}", trabajoActual.getIdTrabajo());
-            cargarDetallesExistentes();
-        } else {
-            LOGGER.log(Level.INFO, "No se seleccionu00f3 ningu00fan trabajo vu00e1lido");
-            vista.mostrarDetalles(null); // Limpiar tabla de detalles
+        try {
+            trabajoActual = vista.getTrabajoSeleccionado();
+            if (trabajoActual != null) {
+                LOGGER.log(Level.INFO, "Trabajo seleccionado: #{0}", trabajoActual.getIdTrabajo());
+                cargarDetallesExistentes();
+            } else {
+                LOGGER.log(Level.INFO, "No se seleccionó ningún trabajo válido");
+                vista.mostrarDetalles(null);
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error al seleccionar trabajo", ex);
+            mostrarError("Error al seleccionar trabajo: " + ex.getMessage());
         }
     }
 
@@ -81,8 +96,13 @@ public class DetalleTrabajoRepuestoController {
         LOGGER.log(Level.INFO, "Cargando lotes disponibles");
         try {
             List<Lote> lotes = loteDAO.obtenerLotesDisponibles();
-            vista.cargarLotes(lotes);
-            LOGGER.log(Level.INFO, "Se cargaron {0} lotes disponibles", lotes.size());
+            if (lotes != null) {
+                vista.cargarLotes(lotes);
+                LOGGER.log(Level.INFO, "Se cargaron {0} lotes disponibles", lotes.size());
+            } else {
+                LOGGER.log(Level.WARNING, "La lista de lotes es nula");
+                mostrarError("No se pudieron cargar los lotes");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al cargar lotes disponibles", e);
             mostrarError("Error al cargar lotes: " + e.getMessage());
@@ -94,9 +114,14 @@ public class DetalleTrabajoRepuestoController {
             LOGGER.log(Level.INFO, "Cargando detalles para el trabajo #{0}", trabajoActual.getIdTrabajo());
             try {
                 List<DetalleTrabajoRepuesto> detalles = detalleDAO.obtenerPorTrabajo(trabajoActual);
-                vista.mostrarDetalles(detalles);
-                LOGGER.log(Level.INFO, "Se cargaron {0} detalles para el trabajo #{1}", 
-                          new Object[]{detalles.size(), trabajoActual.getIdTrabajo()});
+                if (detalles != null) {
+                    vista.mostrarDetalles(detalles);
+                    LOGGER.log(Level.INFO, "Se cargaron {0} detalles para el trabajo #{1}", 
+                              new Object[]{detalles.size(), trabajoActual.getIdTrabajo()});
+                } else {
+                    LOGGER.log(Level.WARNING, "La lista de detalles es nula");
+                    vista.mostrarDetalles(null);
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error al cargar detalles del trabajo", e);
                 mostrarError("Error al cargar detalles: " + e.getMessage());
@@ -105,15 +130,16 @@ public class DetalleTrabajoRepuestoController {
     }
 
     private void buscarLote(ActionEvent e) {
-        String numeroLote = vista.getNumeroLote();
-        if (numeroLote == null || numeroLote.trim().isEmpty()) {
-            mostrarError("Ingrese un nu00famero de lote");
-            return;
-        }
-
-        LOGGER.log(Level.INFO, "Buscando lote con nu00famero: {0}", numeroLote);
         try {
+            String numeroLote = vista.getNumeroLote();
+            if (numeroLote == null || numeroLote.trim().isEmpty()) {
+                mostrarError("Ingrese un número de lote");
+                return;
+            }
+
+            LOGGER.log(Level.INFO, "Buscando lote con número: {0}", numeroLote);
             loteSeleccionado = loteDAO.buscarPorNumeroLote(numeroLote);
+            
             if (loteSeleccionado != null) {
                 vista.setStockDisponible(loteSeleccionado.getCantidadDisponible());
                 LOGGER.log(Level.INFO, "Lote encontrado: #{0} con stock {1}", 
@@ -130,25 +156,35 @@ public class DetalleTrabajoRepuestoController {
     }
 
     private void actualizarStock(ActionEvent e) {
-        loteSeleccionado = vista.getLoteSeleccionado();
-        if (loteSeleccionado != null) {
-            vista.setStockDisponible(loteSeleccionado.getCantidadDisponible());
-            LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}: {1}", 
-                      new Object[]{loteSeleccionado.getId(), loteSeleccionado.getCantidadDisponible()});
+        try {
+            loteSeleccionado = vista.getLoteSeleccionado();
+            if (loteSeleccionado != null) {
+                vista.setStockDisponible(loteSeleccionado.getCantidadDisponible());
+                LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}: {1}", 
+                          new Object[]{loteSeleccionado.getId(), loteSeleccionado.getCantidadDisponible()});
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar stock", ex);
+            mostrarError("Error al actualizar stock: " + ex.getMessage());
         }
     }
 
     private void guardarDetalle(ActionEvent e) {
         LOGGER.log(Level.INFO, "Intentando guardar detalle de trabajo-repuesto");
-        if (validarDatos()) {
-            DetalleTrabajoRepuesto detalle = crearDetalle();
+        try {
+            if (validarDatos()) {
+                DetalleTrabajoRepuesto detalle = crearDetalle();
 
-            if (registrarDetalle(detalle)) {
-                actualizarStockLote();
-                actualizarVista();
-                mostrarMensajeExito("Repuesto registrado correctamente");
-                ejecutarCallbackActualizacion();
+                if (registrarDetalle(detalle)) {
+                    actualizarStockLote();
+                    actualizarVista();
+                    mostrarMensajeExito("Repuesto registrado correctamente");
+                    ejecutarCallbackActualizacion();
+                }
             }
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error al guardar detalle", ex);
+            mostrarError("Error al guardar: " + ex.getMessage());
         }
     }
 
@@ -159,13 +195,13 @@ public class DetalleTrabajoRepuestoController {
         }
 
         if (loteSeleccionado == null) {
-            mostrarError("Seleccione un lote vu00e1lido");
+            mostrarError("Seleccione un lote válido");
             return false;
         }
 
         Integer cantidad = vista.getCantidad();
         if (cantidad == null || cantidad <= 0) {
-            mostrarError("Ingrese una cantidad vu00e1lida");
+            mostrarError("Ingrese una cantidad válida");
             return false;
         }
 
@@ -185,53 +221,48 @@ public class DetalleTrabajoRepuestoController {
         return detalle;
     }
 
-    private boolean registrarDetalle(DetalleTrabajoRepuesto detalle) {
-        try {
-            boolean exito = detalleDAO.agregarDetalle(detalle);
-            if (!exito) {
-                LOGGER.log(Level.WARNING, "No se pudo registrar el detalle");
-                mostrarError("Error al registrar el repuesto");
-            }
-            return exito;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar detalle", e);
-            mostrarError("Error al registrar: " + e.getMessage());
-            return false;
+    private boolean registrarDetalle(DetalleTrabajoRepuesto detalle) throws Exception {
+        boolean exito = detalleDAO.agregarDetalle(detalle);
+        if (!exito) {
+            LOGGER.log(Level.WARNING, "No se pudo registrar el detalle");
+            mostrarError("Error al registrar el repuesto");
         }
+        return exito;
     }
 
-    private void actualizarStockLote() {
+    private void actualizarStockLote() throws Exception {
         int nuevaCantidad = loteSeleccionado.getCantidadDisponible() - vista.getCantidad();
         loteSeleccionado.setCantidadDisponible(nuevaCantidad);
-        try {
-            loteDAO.actualizarStock(loteSeleccionado.getId(), nuevaCantidad);
-            LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}: nuevo stock {1}", 
-                      new Object[]{loteSeleccionado.getId(), nuevaCantidad});
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar stock del lote", e);
-        }
+        loteDAO.actualizarStock(loteSeleccionado.getId(), nuevaCantidad);
+        LOGGER.log(Level.INFO, "Stock actualizado para lote #{0}: nuevo stock {1}", 
+                  new Object[]{loteSeleccionado.getId(), nuevaCantidad});
     }
 
     private void actualizarVista() {
-        vista.limpiarFormulario();
-        cargarDetallesExistentes();
-        cargarLotesDisponibles();
+        try {
+            vista.limpiarFormulario();
+            cargarDetallesExistentes();
+            cargarLotesDisponibles();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar vista", e);
+            mostrarError("Error al actualizar vista: " + e.getMessage());
+        }
     }
 
     private void eliminarDetalle(ActionEvent e) {
-        DetalleTrabajoRepuesto detalle = vista.getDetalleSeleccionado();
-        if (detalle == null) {
-            mostrarError("Seleccione un repuesto para eliminar");
-            return;
-        }
+        try {
+            DetalleTrabajoRepuesto detalle = vista.getDetalleSeleccionado();
+            if (detalle == null) {
+                mostrarError("Seleccione un repuesto para eliminar");
+                return;
+            }
 
-        int confirmacion = JOptionPane.showConfirmDialog(vista,
-                "u00bfEliminar este repuesto del trabajo?",
-                "Confirmar",
-                JOptionPane.YES_NO_OPTION);
+            int confirmacion = JOptionPane.showConfirmDialog(vista,
+                    "¿Eliminar este repuesto del trabajo?",
+                    "Confirmar",
+                    JOptionPane.YES_NO_OPTION);
 
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            try {
+            if (confirmacion == JOptionPane.YES_OPTION) {
                 if (detalleDAO.eliminarDetalle(detalle.getIdDetalle())) {
                     actualizarStockAlEliminar(detalle);
                     cargarDetallesExistentes();
@@ -240,36 +271,32 @@ public class DetalleTrabajoRepuestoController {
                 } else {
                     mostrarError("Error al eliminar el repuesto");
                 }
-            } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "Error al eliminar detalle", ex);
-                mostrarError("Error al eliminar: " + ex.getMessage());
             }
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error al eliminar detalle", ex);
+            mostrarError("Error al eliminar: " + ex.getMessage());
         }
     }
 
-    private void actualizarStockAlEliminar(DetalleTrabajoRepuesto detalle) {
+    private void actualizarStockAlEliminar(DetalleTrabajoRepuesto detalle) throws Exception {
         Lote lote = detalle.getLote();
         int nuevaCantidad = lote.getCantidadDisponible() + detalle.getCantidadUsada();
         lote.setCantidadDisponible(nuevaCantidad);
-        try {
-            loteDAO.actualizarStock(lote.getId(), nuevaCantidad);
-            LOGGER.log(Level.INFO, "Stock restaurado para lote #{0}: nuevo stock {1}", 
-                      new Object[]{lote.getId(), nuevaCantidad});
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al restaurar stock del lote", e);
-        }
+        loteDAO.actualizarStock(lote.getId(), nuevaCantidad);
+        LOGGER.log(Level.INFO, "Stock restaurado para lote #{0}: nuevo stock {1}", 
+                  new Object[]{lote.getId(), nuevaCantidad});
     }
     
     private void ejecutarCallbackActualizacion() {
         if (actualizarCallback != null) {
             try {
-                LOGGER.log(Level.FINE, "Ejecutando callback de actualizaciu00f3n");
+                LOGGER.log(Level.FINE, "Ejecutando callback de actualización");
                 actualizarCallback.run();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error al ejecutar callback de actualizaciu00f3n", e);
+                LOGGER.log(Level.SEVERE, "Error al ejecutar callback de actualización", e);
             }
         } else {
-            LOGGER.log(Level.WARNING, "No hay callback de actualizaciu00f3n configurado");
+            LOGGER.log(Level.WARNING, "No hay callback de actualización configurado");
         }
     }
 
@@ -289,22 +316,14 @@ public class DetalleTrabajoRepuestoController {
                 JOptionPane.showMessageDialog(
                         vista,
                         mensaje,
-                        "u00c9xito",
+                        "Éxito",
                         JOptionPane.INFORMATION_MESSAGE
                 )
         );
     }
     
-    public Runnable getActualizarCallback() {
-        return this.actualizarCallback;
-    }
-
     public void setActualizarCallback(Runnable callback) {
-        Objects.requireNonNull(callback, "El callback no puede ser nulo");
-        this.actualizarCallback = callback;
-
-        // Verificaciu00f3n interna
-        System.out.println("ud83dudd04 Nuevo callback configurado en DetalleTrabajoRepuestoController");
-        System.out.println("   Callback clase: " + callback.getClass().getName());
+        this.actualizarCallback = Objects.requireNonNull(callback, "El callback no puede ser nulo");
+        LOGGER.log(Level.CONFIG, "Nuevo callback configurado en DetalleTrabajoRepuestoController");
     }
 }

@@ -1,8 +1,8 @@
 package com.carmotors.model.enums;
 
 public enum TipoMantenimiento {
-    PREVENTIVO("preventivo"),
-    CORRECTIVO("correctivo");
+    PREVENTIVO("Preventivo"),  // Changed to match database case
+    CORRECTIVO("Correctivo");  // Changed to match database case
 
     private final String descripcion;
 
@@ -14,13 +14,12 @@ public enum TipoMantenimiento {
         return descripcion;
     }
 
-    // Método para convertir de String a Enum
     public static TipoMantenimiento fromString(String text) {
-        for (TipoMantenimiento estado : TipoMantenimiento.values()) {
-            if (estado.descripcion.equalsIgnoreCase(text)) {
-                return estado;
+        for (TipoMantenimiento tipo : TipoMantenimiento.values()) {
+            if (tipo.descripcion.equalsIgnoreCase(text)) {
+                return tipo;
             }
         }
-        throw new IllegalArgumentException("Estado no válido: " + text);
+        throw new IllegalArgumentException("Tipo de mantenimiento no válido: " + text);
     }
 }

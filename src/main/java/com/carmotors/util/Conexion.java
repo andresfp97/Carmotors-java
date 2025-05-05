@@ -16,7 +16,7 @@ public class Conexion {
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
             config.setUsername("root");
-            config.setPassword("root"); // Revisar
+            config.setPassword(""); // Revisar
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(5);
             config.setConnectionTimeout(60000);
@@ -50,5 +50,18 @@ public class Conexion {
             e.printStackTrace();
             throw new RuntimeException("Error al obtener conexión", e);
         }
+    }
+
+    public void close() {
+        if (dataSource != null) {
+            dataSource.close();
+            System.out.println("✅ Pool de conexiones cerrado correctamente");
+        }
+    }
+    public static void logPoolStats() {
+        HikariDataSource ds = Conexion.getConexion().dataSource;
+        System.out.println("Pool stats - Active: " + ds.getHikariPoolMXBean().getActiveConnections() + 
+                          ", Idle: " + ds.getHikariPoolMXBean().getIdleConnections() +
+                          ", Total: " + ds.getHikariPoolMXBean().getTotalConnections());
     }
 }

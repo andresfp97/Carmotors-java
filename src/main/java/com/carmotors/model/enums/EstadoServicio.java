@@ -1,10 +1,10 @@
 package com.carmotors.model.enums;
 
 public enum EstadoServicio {
-    PENDIENTE("Pendiente"),
-    EN_PROCESO("En Proceso"),
-    COMPLETADO("Completado"),
-    CANCELADO("Cancelado");
+    PENDIENTE("PENDIENTE"), // Cambiado para coincidir exactamente con la base de datos
+    EN_PROCESO("EN_PROCESO"),
+    COMPLETADO("COMPLETADO"),
+    CANCELADO("CANCELADO");
 
     private final String descripcion;
 
@@ -16,20 +16,16 @@ public enum EstadoServicio {
         return descripcion;
     }
 
-    // Método para convertir de String a Enum
     public static EstadoServicio fromString(String text) {
+        if (text == null) {
+            return null;
+        }
+        
         for (EstadoServicio estado : EstadoServicio.values()) {
-            if (estado.descripcion.equalsIgnoreCase(text)) {
+            if (estado.descripcion.equalsIgnoreCase(text.trim())) {
                 return estado;
             }
         }
         throw new IllegalArgumentException("Estado no válido: " + text);
-    }
-
-    @Override
-    public String toString() {
-        return "EstadoServicio{" +
-                "descripcion='" + descripcion + '\'' +
-                '}';
     }
 }
