@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.carmotors.run;
 
 
 import com.carmotors.model.Cliente;
+import com.carmotors.model.Proveedor;
 import com.carmotors.modelDAO.*;
 import com.carmotors.view.VentanaPrincipal;
 import javax.swing.SwingUtilities;
@@ -33,7 +30,9 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
             ServicioDAO servicioDAO = new ServicioDAO();
             TrabajoDAO trabajoDAO = new TrabajoDAO();
 
+
             DetalleTrabajoRepuestoDAO detalleTrabajoDAO = new DetalleTrabajoRepuestoDAO();
+            EvaluacionProveedorDAO epdao = new EvaluacionProveedorDAO();
 
             // Debug inicial
             System.out.println("=== DEBUG INICIAL ===");
@@ -55,7 +54,8 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
                     trabajoDAO,
                     detalleTrabajoDAO,
                     aedao,
-                    cadao
+                    cadao,
+                    epdao
                     // Temporalmente null, lo seteamos después
             );
 
@@ -72,10 +72,17 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
                 });
             };
 
+            Runnable actualizarProveedores = () -> {
+                SwingUtilities.invokeLater(() -> {
+                    List<Proveedor> proveedores = proveedorDAO.obtenerTodos();
+                    vista.actualizarListaProveedores(proveedores);
+                });
+            };
+            vista.setActualizarCallback1(actualizarProveedores);
+            actualizarProveedores.run();
+
             // Asignar el callback a la ventana y controladores
             vista.setActualizarCallback(actualizarCallback);
-
-
             vista.setVisible(true);
         });
     }
