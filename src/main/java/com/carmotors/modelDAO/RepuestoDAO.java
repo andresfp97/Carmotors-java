@@ -2,7 +2,6 @@ package com.carmotors.modelDAO;
 
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.TipoRepuesto;
-import com.carmotors.util.Conexion;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 

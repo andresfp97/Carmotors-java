@@ -209,7 +209,7 @@ public class PanelEvaluacionProveedor extends JPanel{
 
         try {
             evaluacionProveedor.setPuntualidad(Integer.parseInt(txtpuntualidad.getText()));
-            evaluacionProveedor.setCalidadProductos(Integer.parseInt(txtCalidadProducto.getText()));
+            evaluacionProveedor.calidad_producto(Integer.parseInt(txtCalidadProducto.getText()));
             evaluacionProveedor.setCosto(Integer.parseInt(txtCosto.getText()));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Los campos de puntuación deben ser números");

@@ -62,7 +62,7 @@ public class EvaluacionProveedor {
         return calidadProductos;
     }
 
-    public void setCalidadProductos(Integer calidadProductos) {
+    public void calidad_producto(Integer calidadProductos) {
         this.calidadProductos = calidadProductos;
     }
 
