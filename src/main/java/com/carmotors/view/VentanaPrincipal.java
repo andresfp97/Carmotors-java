@@ -15,6 +15,7 @@ import com.carmotors.model.DetalleTrabajoRepuesto;
 
 import com.carmotors.controller.*;
 
+import com.carmotors.model.Proveedor;
 import com.carmotors.modelDAO.*;
 
 public class VentanaPrincipal extends JFrame {
@@ -31,10 +32,13 @@ public class VentanaPrincipal extends JFrame {
 
     private Runnable actualizarCallback;
     private ClienteController clienteController;
+    private ProveedorController proveedorController;
 
     private PanelActividadEspecial panelActividadEspecial;
 
     private PanelClienteActividad panelClienteActividad;
+
+    private PanelEvaluacionProveedor panelEvaluacionProveedor;
     private final int MIN_MENU_WIDTH = 250;
 
     public VentanaPrincipal(RepuestoDAO repuestoDAO, ProveedorDAO proveedorDAO,
@@ -42,7 +46,8 @@ public class VentanaPrincipal extends JFrame {
                             VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
                             ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
                             DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
-                            ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO) { // Nuevo DAO agregado
+                            ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
+                            EvaluacionProveedorDAO evaluacionProveedorDAO) { // Nuevo DAO agregado
 
         setTitle("Sistema de Gestión de Repuestos y Proveedores");
         setSize(1200, 700);
@@ -55,7 +60,8 @@ public class VentanaPrincipal extends JFrame {
         initControllers(repuestoDAO, proveedorDAO, clienteDAO, loteDAO,
                 vehiculoDAO, actualizarCallback, servicioDAO,
                 trabajoDAO, detalleTrabajoDAO,
-                actividadEspecialDAO, clienteActividadDAO);
+                actividadEspecialDAO, clienteActividadDAO,
+                evaluacionProveedorDAO);
 
     }
 
@@ -78,6 +84,7 @@ public class VentanaPrincipal extends JFrame {
         panelDetalleTrabajo = new PanelDetalleTrabajoRepuesto(); // Nuevo panel inicializado
         panelActividadEspecial = new PanelActividadEspecial();
         panelClienteActividad = new PanelClienteActividad();
+        panelEvaluacionProveedor = new PanelEvaluacionProveedor();
 
 
         // Agregar paneles al cardLayout
@@ -90,6 +97,7 @@ public class VentanaPrincipal extends JFrame {
         panelDerecho.add(panelDetalleTrabajo, "DetallesTrabajo"); // Nuevo panel agregado
         panelDerecho.add(panelActividadEspecial, "Actividades Especiales");
         panelDerecho.add(panelClienteActividad, "Cliente Actividad");
+        panelDerecho.add(panelEvaluacionProveedor, "Evaluacion Proveedor");
 
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelIzquierdo, panelDerecho);
@@ -105,7 +113,9 @@ public class VentanaPrincipal extends JFrame {
                                  VehiculoDAO vehiculoDAO, Runnable actualizarCallback,
                                  ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
                                  DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
-                                 ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO) { // Nuevo parámetro
+                                 ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
+                                 EvaluacionProveedorDAO evaluacionProveedorDAO
+                                 ) { // Nuevo parámetro
 
 
         new RepuestoController(panelRepuesto, repuestoDao);
@@ -120,6 +130,7 @@ public class VentanaPrincipal extends JFrame {
         new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO, loteDao, trabajoDAO);
         new ActividadEspecialController(panelActividadEspecial, actividadEspecialDAO);
         new ClienteActividadController(panelClienteActividad, clienteActividadDAO);
+        new EvaluacionProveedorController(panelEvaluacionProveedor, evaluacionProveedorDAO, proveedorDao);
     }
 
     private void crearBotonesMenu() {
@@ -129,6 +140,7 @@ public class VentanaPrincipal extends JFrame {
         JButton btnVehiculo = crearBotonMenu("Gestión Vehículo", "Vehiculo");
         JButton btnServicios = crearBotonMenu("Servicios", "Servicios");
         JButton btnTrabajos = crearBotonMenu("Trabajos", "Trabajos");
+        JButton btnEvaluacion = crearBotonMenu("Evaluacion Proveedor", "Evaluacion Proveedor");
 
         // Nuevo botón para detalles de trabajo
         JButton btnDetallesTrabajo = crearBotonMenu("Detalles Trabajo", "DetallesTrabajo");
@@ -141,18 +153,21 @@ public class VentanaPrincipal extends JFrame {
         btnClientes.setForeground(Color.WHITE);
         btnActividades.setForeground(Color.WHITE);
         btnClienteActividad.setBackground(Color.WHITE);
+        btnEvaluacion.setBackground(Color.WHITE);
 
         btnRepuestos.setBackground(new Color(25, 20, 20));
         btnProveedores.setBackground(new Color(25, 20, 20));
         btnClientes.setBackground(new Color(25, 20, 20));
         btnActividades.setBackground(new Color(25, 20, 20));
         btnClienteActividad.setBackground(new Color(25, 20, 20));
+        btnEvaluacion.setBackground(new Color(25, 20, 20));
 
         btnRepuestos.setBorderPainted(false);
         btnProveedores.setBorderPainted(false);
         btnClientes.setBorderPainted(false);
         btnActividades.setBorderPainted(false);
         btnClienteActividad.setBorderPainted(false);
+        btnEvaluacion.setBorderPainted(false);
 
 
         btnRepuestos.addActionListener(e -> cardLayout.show(panelDerecho, "Repuestos"));
@@ -160,6 +175,7 @@ public class VentanaPrincipal extends JFrame {
         btnClientes.addActionListener(e -> cardLayout.show(panelDerecho, "Clientes"));
         btnActividades.addActionListener(e -> cardLayout.show(panelDerecho, "Actividades Especiales"));
         btnClienteActividad.addActionListener(e -> cardLayout.show(panelDerecho, "Cliente Actividad"));
+        btnEvaluacion.addActionListener(e -> cardLayout.show(panelDerecho, "Evaluacion Proveedor"));
 
 
         panelIzquierdo.add(btnRepuestos);
@@ -178,6 +194,8 @@ public class VentanaPrincipal extends JFrame {
         panelIzquierdo.add(btnActividades);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
         panelIzquierdo.add(btnClienteActividad);
+        panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
+        panelIzquierdo.add(btnEvaluacion);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));// Nuevo botón agregado
     }
 
@@ -196,6 +214,19 @@ public class VentanaPrincipal extends JFrame {
     public void actualizarListaClientes(java.util.List<Cliente> clientes) {
         if (panelVehiculo != null) {
             panelVehiculo.cargarClientes(clientes);
+        }
+    }
+
+    public void actualizarListaProveedores(java.util.List<Proveedor> proveedores) {
+        if (panelEvaluacionProveedor != null) {
+            panelEvaluacionProveedor.cargarProveedor(proveedores);
+        }
+    }
+
+    public void setActualizarCallback1(Runnable callback) {
+        this.actualizarCallback = callback;
+        if (proveedorController != null) {
+            actualizarControladorCliente(callback);
         }
     }
 

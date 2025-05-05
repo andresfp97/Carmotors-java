@@ -3,12 +3,15 @@ package com.carmotors.controller;
 import com.carmotors.model.Proveedor;
 import com.carmotors.modelDAO.ProveedorDAO;
 import com.carmotors.view.PanelProveedor;
+import org.jdatepicker.impl.JDatePickerImpl;
+
 import javax.swing.*;
 
 public class ProveedorController {
     private PanelProveedor vista;
 
     private ProveedorDAO proveedorDAO;
+    private JDatePickerImpl datePickerFechaEvaluacion;
 
     public ProveedorController(PanelProveedor vista, ProveedorDAO proveedorDAO) {
         this.vista = vista;
