@@ -10,6 +10,7 @@ public class Trabajo {
     private LocalDate fechaRecepcion;
     private LocalDate fechaEntrega;
     private String tecnicoAsignado;
+    
 
     // Constructor
     public Trabajo(int idTrabajo, Vehiculo vehiculo, Servicio servicio,

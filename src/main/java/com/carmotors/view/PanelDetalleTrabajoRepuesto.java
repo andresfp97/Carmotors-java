@@ -335,11 +335,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         }
     }
 
-    public void setGuardarListener(ActionListener listener) {
-        if (btnGuardar != null && listener != null) {
-            btnGuardar.addActionListener(listener);
-        }
-    }
+  
 
     public void setEliminarListener(ActionListener listener) {
         if (btnEliminar != null && listener != null) {
@@ -390,6 +386,41 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         if (txtCantidad != null) txtCantidad.setText("");
         if (txtLote != null) txtLote.setText("");
         setStockDisponible(0);
+    }
+
+    public void setGuardarListener(ActionListener listener) {
+        btnGuardar.addActionListener(e -> {
+            btnGuardar.setEnabled(false); // Deshabilitar botón durante la operación
+            try {
+                listener.actionPerformed(e);
+            } finally {
+                btnGuardar.setEnabled(true); // Rehabilitar después
+            }
+        });
+    }
+
+    public void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void mostrarExito(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public boolean validarFormulario() {
+        if (getTrabajoSeleccionado() == null) {
+            mostrarError("Seleccione un trabajo");
+            return false;
+        }
+        if (getLoteSeleccionado() == null) {
+            mostrarError("Seleccione un lote");
+            return false;
+        }
+        if (getCantidad() == null || getCantidad() <= 0) {
+            mostrarError("Ingrese una cantidad válida");
+            return false;
+        }
+        return true;
     }
     
 }
