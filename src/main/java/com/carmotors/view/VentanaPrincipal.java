@@ -39,6 +39,8 @@ public class VentanaPrincipal extends JFrame {
     private PanelClienteActividad panelClienteActividad;
 
     private PanelEvaluacionProveedor panelEvaluacionProveedor;
+
+    private PanelGestionProveedores panelGestionProveedores;
     private final int MIN_MENU_WIDTH = 250;
 
     public VentanaPrincipal(RepuestoDAO repuestoDAO, ProveedorDAO proveedorDAO,
@@ -47,7 +49,8 @@ public class VentanaPrincipal extends JFrame {
                             ServicioDAO servicioDAO, TrabajoDAO trabajoDAO,
                             DetalleTrabajoRepuestoDAO detalleTrabajoDAO,
                             ActividadEspecialDAO actividadEspecialDAO, ClienteActividadDAO clienteActividadDAO,
-                            EvaluacionProveedorDAO evaluacionProveedorDAO) { // Nuevo DAO agregado
+                            EvaluacionProveedorDAO evaluacionProveedorDAO
+                            ) { // Nuevo DAO agregado
 
         setTitle("Sistema de Gestión de Repuestos y Proveedores");
         setSize(1200, 700);
@@ -85,11 +88,11 @@ public class VentanaPrincipal extends JFrame {
         panelActividadEspecial = new PanelActividadEspecial();
         panelClienteActividad = new PanelClienteActividad();
         panelEvaluacionProveedor = new PanelEvaluacionProveedor();
-
+        panelGestionProveedores = new PanelGestionProveedores();
 
         // Agregar paneles al cardLayout
         panelDerecho.add(panelRepuesto, "Repuestos");
-        panelDerecho.add(panelProveedor, "Proveedores");
+        panelDerecho.add(panelGestionProveedores, "GestionProveedores");
         panelDerecho.add(panelCliente, "Clientes");
         panelDerecho.add(panelVehiculo, "Vehiculo");
         panelDerecho.add(panelServicio, "Servicios");
@@ -97,7 +100,6 @@ public class VentanaPrincipal extends JFrame {
         panelDerecho.add(panelDetalleTrabajo, "DetallesTrabajo"); // Nuevo panel agregado
         panelDerecho.add(panelActividadEspecial, "Actividades Especiales");
         panelDerecho.add(panelClienteActividad, "Cliente Actividad");
-        panelDerecho.add(panelEvaluacionProveedor, "Evaluacion Proveedor");
 
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelIzquierdo, panelDerecho);
@@ -119,7 +121,7 @@ public class VentanaPrincipal extends JFrame {
 
 
         new RepuestoController(panelRepuesto, repuestoDao);
-        new ProveedorController(panelProveedor, proveedorDao);
+        new ProveedorController(panelGestionProveedores, proveedorDao);
         this.clienteController = new ClienteController(panelCliente, clienteDao, actualizarCallback);
         new LoteController(panelRepuesto, loteDao);
         new VehiculoController(panelVehiculo, vehiculoDAO, clienteDao);
@@ -130,17 +132,16 @@ public class VentanaPrincipal extends JFrame {
         new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO, loteDao, trabajoDAO);
         new ActividadEspecialController(panelActividadEspecial, actividadEspecialDAO);
         new ClienteActividadController(panelClienteActividad, clienteActividadDAO);
-        new EvaluacionProveedorController(panelEvaluacionProveedor, evaluacionProveedorDAO, proveedorDao);
+        new EvaluacionProveedorController(panelGestionProveedores, evaluacionProveedorDAO, proveedorDao);
     }
 
     private void crearBotonesMenu() {
         JButton btnRepuestos = crearBotonMenu("Gestión de Inventario", "Repuestos");
-        JButton btnProveedores = crearBotonMenu("Proveedores y Compras", "Proveedores");
+        JButton btnGestionProveedores = crearBotonMenu("Gestion de Proveedores", "GestionProveedores");
         JButton btnClientes = crearBotonMenu("Clientes y Facturación", "Clientes");
         JButton btnVehiculo = crearBotonMenu("Gestión Vehículo", "Vehiculo");
         JButton btnServicios = crearBotonMenu("Servicios", "Servicios");
         JButton btnTrabajos = crearBotonMenu("Trabajos", "Trabajos");
-        JButton btnEvaluacion = crearBotonMenu("Evaluacion Proveedor", "Evaluacion Proveedor");
 
         // Nuevo botón para detalles de trabajo
         JButton btnDetallesTrabajo = crearBotonMenu("Detalles Trabajo", "DetallesTrabajo");
@@ -149,38 +150,36 @@ public class VentanaPrincipal extends JFrame {
 
 
         btnRepuestos.setForeground(Color.WHITE);
-        btnProveedores.setForeground(Color.WHITE);
+        btnGestionProveedores.setForeground(Color.WHITE);
         btnClientes.setForeground(Color.WHITE);
         btnActividades.setForeground(Color.WHITE);
         btnClienteActividad.setBackground(Color.WHITE);
-        btnEvaluacion.setBackground(Color.WHITE);
 
         btnRepuestos.setBackground(new Color(25, 20, 20));
-        btnProveedores.setBackground(new Color(25, 20, 20));
+        btnGestionProveedores.setBackground(new Color(25, 20, 20));
         btnClientes.setBackground(new Color(25, 20, 20));
         btnActividades.setBackground(new Color(25, 20, 20));
         btnClienteActividad.setBackground(new Color(25, 20, 20));
-        btnEvaluacion.setBackground(new Color(25, 20, 20));
+
 
         btnRepuestos.setBorderPainted(false);
-        btnProveedores.setBorderPainted(false);
+        btnGestionProveedores.setBorderPainted(false);
         btnClientes.setBorderPainted(false);
         btnActividades.setBorderPainted(false);
         btnClienteActividad.setBorderPainted(false);
-        btnEvaluacion.setBorderPainted(false);
+
 
 
         btnRepuestos.addActionListener(e -> cardLayout.show(panelDerecho, "Repuestos"));
-        btnProveedores.addActionListener(e -> cardLayout.show(panelDerecho, "Proveedores"));
+        btnGestionProveedores.addActionListener(e -> cardLayout.show(panelDerecho, "GestionProveedores"));
         btnClientes.addActionListener(e -> cardLayout.show(panelDerecho, "Clientes"));
         btnActividades.addActionListener(e -> cardLayout.show(panelDerecho, "Actividades Especiales"));
         btnClienteActividad.addActionListener(e -> cardLayout.show(panelDerecho, "Cliente Actividad"));
-        btnEvaluacion.addActionListener(e -> cardLayout.show(panelDerecho, "Evaluacion Proveedor"));
 
 
         panelIzquierdo.add(btnRepuestos);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
-        panelIzquierdo.add(btnProveedores);
+        panelIzquierdo.add(btnGestionProveedores);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
         panelIzquierdo.add(btnClientes);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -195,8 +194,7 @@ public class VentanaPrincipal extends JFrame {
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
         panelIzquierdo.add(btnClienteActividad);
         panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));
-        panelIzquierdo.add(btnEvaluacion);
-        panelIzquierdo.add(Box.createRigidArea(new Dimension(0, 10)));// Nuevo botón agregado
+        // Nuevo botón agregado
     }
 
     private JButton crearBotonMenu(String texto, String comando) {
