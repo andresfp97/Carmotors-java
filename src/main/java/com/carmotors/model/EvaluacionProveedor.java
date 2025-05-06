@@ -94,4 +94,9 @@ public class EvaluacionProveedor {
                 ", observaciones='" + observaciones + '\'' +
                 '}';
     }
+
+    public void setCalidadProductos(int int1) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCalidadProductos'");
+    }
 }

@@ -1,6 +1,5 @@
 package com.carmotors.view;
 
-
 import com.carmotors.model.EvaluacionProveedor;
 import com.carmotors.model.Proveedor;
 import org.jdatepicker.impl.JDatePanelImpl;
@@ -8,25 +7,28 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
-public class PanelEvaluacionProveedor extends JPanel{
+public class PanelEvaluacionProveedor extends JPanel {
     private JDatePickerImpl datePickerFechaEvaluacion;
     private JTextField txtpuntualidad, txtCalidadProducto, txtCosto, txtObservaciones;
-    private JComboBox<PanelEvaluacionProveedor.ProveedorCombo> cbProveedores;
+    private JComboBox<ProveedorCombo> cbProveedores;
     private JButton btnGuardarEvaluacion;
 
     public PanelEvaluacionProveedor() {
-        setLayout(new GridLayout(8, 2, 10, 10));
-        setBackground(new Color(40, 35, 35));
-        initComponents(); // Solo un método de inicialización
+        setLayout(new BorderLayout());
+        setBackground(new Color(245, 245, 245)); // Fondo gris claro
+        setBorder(new EmptyBorder(15, 15, 15, 15)); // Márgenes alrededor del panel
+        initComponents();
         configurarComboproveedores();
     }
 
@@ -35,81 +37,147 @@ public class PanelEvaluacionProveedor extends JPanel{
     }
 
     private void initComponents() {
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220)),
+                new EmptyBorder(15, 15, 15, 15)
+        ));
 
-        cbProveedores = new JComboBox<>();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10); // Espacio entre componentes
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Hacer que los campos de texto se expandan
+        gbc.anchor = GridBagConstraints.WEST;
 
+        JLabel lblProveedor = createStyledLabel("Proveedor:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(lblProveedor, gbc);
+        cbProveedores = createStyledComboBox();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        formPanel.add(cbProveedores, gbc);
+
+        JLabel lblFechaEvaluacion = createStyledLabel("Fecha de Evaluación:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(lblFechaEvaluacion, gbc);
         UtilDateModel model = new UtilDateModel();
         Properties p = new Properties();
         p.put("text.today", "Hoy");
         p.put("text.month", "Mes");
         p.put("text.year", "Año");
-
         JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
         datePickerFechaEvaluacion = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         JPanel datePanelWrapper = new JPanel(new BorderLayout());
         datePanelWrapper.setBackground(Color.WHITE);
         datePanelWrapper.add(datePickerFechaEvaluacion, BorderLayout.WEST);
+        datePickerFechaEvaluacion.getJFormattedTextField().setBorder(createTextFieldBorder());
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        formPanel.add(datePanelWrapper, gbc);
 
-        txtpuntualidad    = new JTextField();
-        txtCalidadProducto = new JTextField();
-        txtCosto = new JTextField();
-        txtObservaciones = new JTextField();
-        btnGuardarEvaluacion = new JButton("Guardar evaluacion");
+        JLabel lblPuntualidad = createStyledLabel("Puntualidad:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(lblPuntualidad, gbc);
+        txtpuntualidad = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        formPanel.add(txtpuntualidad, gbc);
 
-        // Configurar combo box
-        cbProveedores.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof PanelEvaluacionProveedor.ProveedorCombo) {
-                    PanelEvaluacionProveedor.ProveedorCombo proveedor = (PanelEvaluacionProveedor.ProveedorCombo) value;
-                    setText(proveedor.getDisplayText());
-                }
-                return this;
-            }
-        });
+        JLabel lblCalidadProducto = createStyledLabel("Calidad del Producto:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(lblCalidadProducto, gbc);
+        txtCalidadProducto = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        formPanel.add(txtCalidadProducto, gbc);
 
-        JLabel[] labels = {
-                new JLabel("ID del Proveedor:"),
-                new JLabel("Fecha de evaluacion:"),
-                new JLabel("Puntualidad:"),
-                new JLabel("Calidad del Producto:"),
-                new JLabel("Porcentaje de Costo:"),
-                new JLabel("Observaciones:")
-        };
+        JLabel lblCosto = createStyledLabel("Porcentaje de Costo:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        formPanel.add(lblCosto, gbc);
+        txtCosto = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        formPanel.add(txtCosto, gbc);
 
-        // Configurar colores de las etiquetas
-        for (JLabel label : labels) {
-            label.setForeground(Color.WHITE);
-        }
+        JLabel lblObservaciones = createStyledLabel("Observaciones:");
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        formPanel.add(lblObservaciones, gbc);
+        txtObservaciones = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        formPanel.add(txtObservaciones, gbc);
 
-        // Agregar componentes al panel
-        add(labels[0]); add(cbProveedores);
-        add(labels[1]); add(datePanelWrapper);
-        add(labels[2]); add(txtpuntualidad);
-        add(labels[3]); add(txtCalidadProducto);
-        add(labels[4]); add(txtCosto);
-        add(labels[5]); add(txtObservaciones);
-        add(btnGuardarEvaluacion);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(Color.WHITE);
+        btnGuardarEvaluacion = createStyledButton("Guardar Evaluación", new Color(76, 175, 80)); // Verde
+        buttonPanel.add(btnGuardarEvaluacion);
+
+        add(formPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
+
+    private JLabel createStyledLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setForeground(new Color(50, 50, 50));
+        return label;
+    }
+
+    private JTextField createStyledTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textField.setBorder(createTextFieldBorder());
+        return textField;
+    }
+
+    private CompoundBorder createTextFieldBorder() {
+        return new CompoundBorder(
+                new LineBorder(new Color(200, 200, 200)),
+                new EmptyBorder(8, 10, 8, 10)
+        );
+    }
+
+    private JComboBox<ProveedorCombo> createStyledComboBox() {
+        JComboBox<ProveedorCombo> comboBox = new JComboBox<>();
+        comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        comboBox.setBorder(createTextFieldBorder());
+        return comboBox;
+    }
+
+    private JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(new EmptyBorder(10, 20, 10, 20));
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
     private void configurarComboproveedores() {
-        // Configurar renderizador personalizado
         cbProveedores.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
                                                           int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof PanelEvaluacionProveedor.ProveedorCombo) {
-                    PanelEvaluacionProveedor.ProveedorCombo cc = (PanelEvaluacionProveedor.ProveedorCombo) value;
+                if (value instanceof ProveedorCombo) {
+                    ProveedorCombo cc = (ProveedorCombo) value;
                     setText(cc.toString());
                 }
                 return this;
             }
         });
 
-        // Añadir listener para debug
         cbProveedores.addActionListener(e -> {
-            PanelEvaluacionProveedor.ProveedorCombo seleccionado = (PanelEvaluacionProveedor.ProveedorCombo) cbProveedores.getSelectedItem();
+            ProveedorCombo seleccionado = (ProveedorCombo) cbProveedores.getSelectedItem();
             System.out.println("Proveedor seleccionado: " + (seleccionado != null ? seleccionado.getId() : "null"));
         });
     }
@@ -148,7 +216,6 @@ public class PanelEvaluacionProveedor extends JPanel{
         }
     }
 
-
     // Clase interna para manejar el combo de Proveedores
     private static class ProveedorCombo {
         private final Integer id;
@@ -175,11 +242,9 @@ public class PanelEvaluacionProveedor extends JPanel{
 
     public void limpiarFormulario() {
         cbProveedores.setSelectedIndex(-1);
-
         datePickerFechaEvaluacion.getModel().setValue(null);
         datePickerFechaEvaluacion.getModel().setSelected(false);
         datePickerFechaEvaluacion.getJFormattedTextField().setText("");
-
         txtpuntualidad.setText("");
         txtCalidadProducto.setText("");
         txtCosto.setText("");
@@ -208,9 +273,9 @@ public class PanelEvaluacionProveedor extends JPanel{
         }
 
         try {
-            evaluacionProveedor.setPuntualidad(Integer.parseInt(txtpuntualidad.getText()));
-            evaluacionProveedor.calidad_producto(Integer.parseInt(txtCalidadProducto.getText()));
-            evaluacionProveedor.setCosto(Integer.parseInt(txtCosto.getText()));
+            evaluacionProveedor.setPuntualidad(parseInt(txtpuntualidad.getText()));
+            evaluacionProveedor.setCalidadProductos(parseInt(txtCalidadProducto.getText()));
+            evaluacionProveedor.setCosto(parseInt(txtCosto.getText()));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Los campos de puntuación deben ser números");
         }
@@ -232,17 +297,16 @@ public class PanelEvaluacionProveedor extends JPanel{
         btnGuardarEvaluacion.addActionListener(listener);
     }
 
-
     public void cargarProveedor(java.util.List<Proveedor> proveedores) {
-        DefaultComboBoxModel<PanelEvaluacionProveedor.ProveedorCombo> model = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<ProveedorCombo> model = new DefaultComboBoxModel<>();
 
         // Opción por defecto
-        model.addElement(new PanelEvaluacionProveedor.ProveedorCombo(null, "-- Seleccione un proveedor --"));
+        model.addElement(new ProveedorCombo(null, "-- Seleccione un proveedor --"));
 
         if (proveedores != null && !proveedores.isEmpty()) {
             for (Proveedor proveedor : proveedores) {
                 String displayText = String.format("%s (%s)", proveedor.getNombre(), proveedor.getId());
-                model.addElement(new PanelEvaluacionProveedor.ProveedorCombo(proveedor.getId(), displayText));
+                model.addElement(new ProveedorCombo(proveedor.getId(), displayText));
             }
         } else {
             System.out.println("[WARNING] Lista de proveedores vacía o nula");
@@ -264,11 +328,33 @@ public class PanelEvaluacionProveedor extends JPanel{
     }
 
     public void setDatosFormulario(EvaluacionProveedor evaluacionProveedor) {
-        cbProveedores.setSelectedItem(evaluacionProveedor.getProveedor().getId());
+        // Buscar y seleccionar el proveedor en el JComboBox
+        if (evaluacionProveedor.getProveedor() != null) {
+            DefaultComboBoxModel<ProveedorCombo> model = (DefaultComboBoxModel<ProveedorCombo>) cbProveedores.getModel();
+            for (int i = 0; i < model.getSize(); i++) {
+                ProveedorCombo combo = model.getElementAt(i);
+                if (combo.getId() != null && combo.getId().equals(evaluacionProveedor.getProveedor().getId())) {
+                    cbProveedores.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        // Establecer la fecha en el JDatePicker
+        if (evaluacionProveedor.getFechaEvaluacion() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(evaluacionProveedor.getFechaEvaluacion());
+            datePickerFechaEvaluacion.getModel().setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            datePickerFechaEvaluacion.getModel().setSelected(true);
+        } else {
+            datePickerFechaEvaluacion.getModel().setValue(null);
+            datePickerFechaEvaluacion.getModel().setSelected(false);
+            datePickerFechaEvaluacion.getJFormattedTextField().setText("");
+        }
+
         txtpuntualidad.setText(String.valueOf(evaluacionProveedor.getPuntualidad()));
         txtCalidadProducto.setText(String.valueOf(evaluacionProveedor.getCalidadProductos()));
-        txtCosto.setText(String.valueOf(evaluacionProveedor.getCalidadProductos() ));
+        txtCosto.setText(String.valueOf(evaluacionProveedor.getCosto()));
         txtObservaciones.setText(evaluacionProveedor.getObservaciones());
     }
-
 }

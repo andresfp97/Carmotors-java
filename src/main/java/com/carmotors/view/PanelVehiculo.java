@@ -2,9 +2,15 @@ package com.carmotors.view;
 
 import com.carmotors.model.Cliente;
 import com.carmotors.model.Vehiculo;
+
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Objects;
 
 public class PanelVehiculo extends JPanel {
     private JTextField txtMarca, txtModelo, txtPlaca, txtTipoVehiculo;
@@ -12,23 +18,89 @@ public class PanelVehiculo extends JPanel {
     private JButton btnGuardar, btnLimpiar, btnBuscarCliente;
 
     public PanelVehiculo() {
-        setLayout(new GridLayout(8, 2, 10, 10));
-        setBackground(new Color(40, 35, 35));
-        initComponents(); // Solo un método de inicialización
-        configurarComboClientes();
+        setLayout(new BorderLayout());
+        setBackground(new Color(245, 245, 245)); // Fondo gris claro
+        setBorder(new EmptyBorder(15, 15, 15, 15)); // Márgenes alrededor del panel
+        initComponents();
     }
 
     private void initComponents() {
-        cbClientes = new JComboBox<>();
-        txtMarca = new JTextField();
-        txtModelo = new JTextField();
-        txtPlaca = new JTextField();
-        txtTipoVehiculo = new JTextField();
-        btnGuardar = new JButton("Guardar");
-        btnLimpiar = new JButton("Limpiar");
-        btnBuscarCliente = new JButton("Buscar Cliente");
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220)),
+                new EmptyBorder(15, 15, 15, 15)
+        ));
 
-        // Configurar combo box
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10); // Espacio entre componentes
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Hacer que los campos de texto se expandan
+
+        JLabel lblCliente = createStyledLabel("Cliente:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(lblCliente, gbc);
+
+        JPanel clientePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        clientePanel.setBackground(Color.WHITE);
+        cbClientes = createStyledComboBox();
+        clientePanel.add(cbClientes);
+        btnBuscarCliente = createStyledButton("Buscar", new Color(63, 81, 181)); // Azul indigo
+        clientePanel.add(btnBuscarCliente);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        formPanel.add(clientePanel, gbc);
+
+        JLabel lblMarca = createStyledLabel("Marca:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(lblMarca, gbc);
+        txtMarca = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        formPanel.add(txtMarca, gbc);
+
+        JLabel lblModelo = createStyledLabel("Modelo:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(lblModelo, gbc);
+        txtModelo = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        formPanel.add(txtModelo, gbc);
+
+        JLabel lblPlaca = createStyledLabel("Placa:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(lblPlaca, gbc);
+        txtPlaca = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        formPanel.add(txtPlaca, gbc);
+
+        JLabel lblTipoVehiculo = createStyledLabel("Tipo de Vehículo:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        formPanel.add(lblTipoVehiculo, gbc);
+        txtTipoVehiculo = createStyledTextField();
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        formPanel.add(txtTipoVehiculo, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(Color.WHITE);
+        btnGuardar = createStyledButton("Guardar", new Color(76, 175, 80)); // Verde
+        buttonPanel.add(btnGuardar);
+        btnLimpiar = createStyledButton("Limpiar", new Color(255, 152, 0)); // Naranja
+        buttonPanel.add(btnLimpiar);
+
+        add(formPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        btnLimpiar.addActionListener(e -> limpiarFormulario());
+
+        // Configurar renderizador personalizado para el ComboBox
         cbClientes.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -40,34 +112,47 @@ public class PanelVehiculo extends JPanel {
                 return this;
             }
         });
-
-        JLabel[] labels = {
-                new JLabel("Cliente:"),
-                new JLabel("Marca:"),
-                new JLabel("Modelo:"),
-                new JLabel("Placa:"),
-                new JLabel("Tipo de Vehículo:")
-        };
-
-        // Configurar colores de las etiquetas
-        for (JLabel label : labels) {
-            label.setForeground(Color.WHITE);
-        }
-
-        // Agregar componentes al panel
-        add(labels[0]); add(cbClientes);
-        add(new JLabel()); add(btnBuscarCliente); // Espacio y botón buscar
-        add(labels[1]); add(txtMarca);
-        add(labels[2]); add(txtModelo);
-        add(labels[3]); add(txtPlaca);
-        add(labels[4]); add(txtTipoVehiculo);
-        add(btnGuardar); add(btnLimpiar);
-
-        // Acción para limpiar formulario
-        btnLimpiar.addActionListener(e -> limpiarFormulario());
     }
+
+    private JLabel createStyledLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setForeground(new Color(50, 50, 50));
+        return label;
+    }
+
+    private JTextField createStyledTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textField.setBorder(new CompoundBorder(
+                new LineBorder(new Color(200, 200, 200)),
+                new EmptyBorder(8, 10, 8, 10)
+        ));
+        return textField;
+    }
+
+    private JComboBox<ClienteCombo> createStyledComboBox() {
+        JComboBox<ClienteCombo> comboBox = new JComboBox<>();
+        comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        comboBox.setBorder(new CompoundBorder(
+                new LineBorder(new Color(200, 200, 200)),
+                new EmptyBorder(8, 10, 8, 10)
+        ));
+        return comboBox;
+    }
+
+    private JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(new EmptyBorder(10, 20, 10, 20));
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
     private void configurarComboClientes() {
-        // Configurar renderizador personalizado
         cbClientes.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -81,14 +166,12 @@ public class PanelVehiculo extends JPanel {
             }
         });
 
-        // Añadir listener para debug
         cbClientes.addActionListener(e -> {
             ClienteCombo seleccionado = (ClienteCombo) cbClientes.getSelectedItem();
             System.out.println("Cliente seleccionado: " + (seleccionado != null ? seleccionado.getId() : "null"));
         });
     }
 
-    // Clase interna para manejar el combo de clientes
     private static class ClienteCombo {
         private final Integer id;
         private final String displayText;
@@ -122,18 +205,14 @@ public class PanelVehiculo extends JPanel {
 
     public Vehiculo getDatosFormulario() {
         Vehiculo vehiculo = new Vehiculo();
-
-        // Obtener ID del cliente seleccionado
         if (cbClientes.getSelectedItem() instanceof ClienteCombo) {
             ClienteCombo cliente = (ClienteCombo) cbClientes.getSelectedItem();
             vehiculo.setId(cliente.getId());
         }
-
         vehiculo.setMarca(txtMarca.getText());
         vehiculo.setModelo(txtModelo.getText());
         vehiculo.setPlaca(txtPlaca.getText());
         vehiculo.setTipoVehiculo(txtTipoVehiculo.getText());
-
         return vehiculo;
     }
 
@@ -153,12 +232,9 @@ public class PanelVehiculo extends JPanel {
         txtTipoVehiculo.setText(vehiculo.getTipoVehiculo());
     }
 
-    public void cargarClientes(java.util.List<Cliente> clientes) {
+    public void cargarClientes(List<Cliente> clientes) {
         DefaultComboBoxModel<ClienteCombo> model = new DefaultComboBoxModel<>();
-
-        // Opción por defecto
         model.addElement(new ClienteCombo(null, "-- Seleccione un cliente --"));
-
         if (clientes != null && !clientes.isEmpty()) {
             for (Cliente cliente : clientes) {
                 String displayText = String.format("%s (%s)", cliente.getNombre(), cliente.getIdentificacion());
@@ -167,22 +243,16 @@ public class PanelVehiculo extends JPanel {
         } else {
             System.out.println("[WARNING] Lista de clientes vacía o nula");
         }
-
-        // Actualización segura en el hilo de eventos
         SwingUtilities.invokeLater(() -> {
             cbClientes.setModel(model);
             System.out.println("[DEBUG] ComboBox actualizado con " + model.getSize() + " elementos");
-
-            // Seleccionar el primer elemento si existe
             if (model.getSize() > 1) {
-                cbClientes.setSelectedIndex(1); // Saltar la opción por defecto
+                cbClientes.setSelectedIndex(1);
             }
-
             cbClientes.revalidate();
             cbClientes.repaint();
         });
     }
-
 
     public Integer getClienteSeleccionadoId() {
         if (cbClientes.getSelectedItem() instanceof ClienteCombo) {

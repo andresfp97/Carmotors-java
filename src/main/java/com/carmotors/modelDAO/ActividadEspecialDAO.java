@@ -2,37 +2,20 @@ package com.carmotors.modelDAO;
 
 import com.carmotors.model.ActividadEspecial;
 import com.carmotors.model.enums.TipoActividadEspecial;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.carmotors.util.Conexion;
 
 public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
-    private final HikariDataSource dataSource;
-
-    public ActividadEspecialDAO() {
-        // Configuración directa de HikariCP
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
-        config.setUsername("root");
-        config.setPassword("root");
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
-
-        config.setMaximumPoolSize(10);
-        config.setConnectionTimeout(5000);
-        config.setIdleTimeout(600000);
-
-        this.dataSource = new HikariDataSource(config);
-    }
 
     @Override
     public boolean agregar(ActividadEspecial actividad) {
         String sql = "INSERT INTO actividad_especial (tipo_actividad, descripcion, fecha_inicio, fecha_fin) VALUES (?, ?, ?, ?)";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setString(1, actividad.getTipoActividad().name());
             pstmt.setString(2, actividad.getDescripcion());
@@ -60,8 +43,8 @@ public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
         String sql = "SELECT * FROM actividad_especial WHERE id_actividad = ?";
         ActividadEspecial actividad = null;
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -78,9 +61,9 @@ public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
         List<ActividadEspecial> actividades = new ArrayList<>();
         String sql = "SELECT * FROM actividad_especial";
 
-        try (Connection con = dataSource.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 actividades.add(mapearActividad(rs));
             }
@@ -90,13 +73,12 @@ public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
         return actividades;
     }
 
-
     public List<ActividadEspecial> buscarPorId(Integer id) {
         List<ActividadEspecial> actividades = new ArrayList<>();
         String sql = "SELECT * FROM actividad_especial WHERE id_actividad = ?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -109,12 +91,11 @@ public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
         return actividades;
     }
 
-
     public String eliminarPorId(Integer id) {
         String sql = "DELETE FROM actividad_especial WHERE id_actividad = ?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             int affectedRows = pstmt.executeUpdate();
 
@@ -137,8 +118,8 @@ public class ActividadEspecialDAO implements CrudDAO<ActividadEspecial> {
         List<ActividadEspecial> actividades = new ArrayList<>();
         String sql = "SELECT * FROM actividad_especial WHERE descripcion LIKE ? OR tipo_actividad LIKE ?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             String parametroBusqueda = "%" + criterio + "%";
             pstmt.setString(1, parametroBusqueda);
