@@ -33,6 +33,7 @@ public class Repuesto {
         this.modeloCompatible = modeloCompatible;
         this.vidaUtilEstimada = vidaUtilEstimada;
         this.precio = precio;
+        this.precio = precio;
     }
 
     public Integer getId() {

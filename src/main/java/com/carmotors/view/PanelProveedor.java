@@ -1,12 +1,15 @@
 package com.carmotors.view;
 
 import com.carmotors.model.Proveedor;
+import com.carmotors.model.enums.FrecuenciaVisitas;
+
 import javax.swing.*;
 import java.awt.*;
 
+
 public class PanelProveedor extends JPanel {
     private JTextField txtNombre, txtNit, txtContacto;
-    private JSpinner spnFrecuencia;
+    private JComboBox<FrecuenciaVisitas> cmbFrecuencia;
     private JButton btnGuardar, btnLimpiar;
 
     public PanelProveedor() {
@@ -19,15 +22,29 @@ public class PanelProveedor extends JPanel {
         txtNombre = new JTextField();
         txtNit = new JTextField();
         txtContacto = new JTextField();
-        spnFrecuencia = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+        
+        // Cambiamos el JSpinner por un JComboBox con las opciones del enum
+        cmbFrecuencia = new JComboBox<>(FrecuenciaVisitas.values());
+        cmbFrecuencia.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
+                    boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof FrecuenciaVisitas) {
+                    setText(((FrecuenciaVisitas) value).getDescripcion());
+                }
+                return this;
+            }
+        });
+        
         btnGuardar = new JButton("Guardar");
         btnLimpiar = new JButton("Limpiar");
 
         JLabel[] labels = {
-                new JLabel("Nombre:"),
-                new JLabel("NIT:"),
-                new JLabel("Contacto:"),
-                new JLabel("Frecuencia de visitas (días):")
+            new JLabel("Nombre:"),
+            new JLabel("NIT:"),
+            new JLabel("Contacto:"),
+            new JLabel("Frecuencia de visitas:")
         };
 
         for (JLabel label : labels) {
@@ -37,7 +54,7 @@ public class PanelProveedor extends JPanel {
         add(labels[0]); add(txtNombre);
         add(labels[1]); add(txtNit);
         add(labels[2]); add(txtContacto);
-        add(labels[3]); add(spnFrecuencia);
+        add(labels[3]); add(cmbFrecuencia);
         add(btnGuardar); add(btnLimpiar);
 
         btnLimpiar.addActionListener(e -> limpiarFormulario());
@@ -45,10 +62,10 @@ public class PanelProveedor extends JPanel {
 
     public Proveedor getDatosFormulario() {
         Proveedor p = new Proveedor();
-        p.setNombre(txtNombre.getText());
-        p.setNit(txtNit.getText());
-        p.setContacto(txtContacto.getText());
-        p.setFrecuenciaVisitas((Integer) spnFrecuencia.getValue());
+        p.setNombre(txtNombre.getText().trim());   
+        p.setNit(txtNit.getText().trim());
+        p.setContacto(txtContacto.getText().trim());
+        p.setFrecuenciaVisitas((FrecuenciaVisitas) cmbFrecuencia.getSelectedItem());
         return p;
     }
 
@@ -56,7 +73,7 @@ public class PanelProveedor extends JPanel {
         txtNombre.setText("");
         txtNit.setText("");
         txtContacto.setText("");
-        spnFrecuencia.setValue(1);
+        cmbFrecuencia.setSelectedIndex(0);
     }
 
     public void setGuardarListener(java.awt.event.ActionListener listener) {
@@ -67,6 +84,6 @@ public class PanelProveedor extends JPanel {
         txtNombre.setText(proveedor.getNombre());
         txtNit.setText(proveedor.getNit());
         txtContacto.setText(proveedor.getContacto());
-        spnFrecuencia.setValue(proveedor.getFrecuenciaVisitas());
+        cmbFrecuencia.setSelectedItem(proveedor.getFrecuenciaVisitas());
     }
 }

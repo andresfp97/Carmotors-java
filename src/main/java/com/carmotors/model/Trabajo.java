@@ -2,6 +2,8 @@ package com.carmotors.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Trabajo {
     private int idTrabajo;
@@ -10,12 +12,16 @@ public class Trabajo {
     private LocalDate fechaRecepcion;
     private LocalDate fechaEntrega;
     private String tecnicoAsignado;
+    private List<DetalleTrabajoRepuesto> repuestosUtilizados;
     
+    
+    public Trabajo() {
 
+    }
     // Constructor
     public Trabajo(int idTrabajo, Vehiculo vehiculo, Servicio servicio,
-                   LocalDate fechaRecepcion, LocalDate fechaEntrega,
-                   String tecnicoAsignado) {
+            LocalDate fechaRecepcion, LocalDate fechaEntrega,
+            String tecnicoAsignado) {
         this.idTrabajo = idTrabajo;
         this.vehiculo = vehiculo;
         this.servicio = servicio;
@@ -24,8 +30,9 @@ public class Trabajo {
         this.tecnicoAsignado = tecnicoAsignado;
     }
 
-    public Trabajo() {
-
+   
+    public int getId() {
+        return idTrabajo;
     }
 
     // Getters y Setters
@@ -77,11 +84,29 @@ public class Trabajo {
         this.tecnicoAsignado = tecnicoAsignado;
     }
 
+    public List<DetalleTrabajoRepuesto> getRepuestosUtilizados() {
+        if (repuestosUtilizados == null) {
+            System.out.println("[DEBUG] Lista de repuestos es null, inicializando...");
+            repuestosUtilizados = new ArrayList<>();
+        }
+        return repuestosUtilizados;
+    }
+
+    public void setRepuestosUtilizados(List<DetalleTrabajoRepuesto> repuestosUtilizados) {
+        this.repuestosUtilizados = repuestosUtilizados;
+    }
     @Override
     public String toString() {
-        String fecha = fechaRecepcion != null ? 
-                      fechaRecepcion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : 
-                      "Sin fecha";
-        return "Trabajo #" + idTrabajo + " - " + fecha;
+        return "Trabajo [idTrabajo=" + idTrabajo + ", vehiculo=" + vehiculo + ", servicio=" + servicio
+                + ", fechaRecepcion=" + fechaRecepcion + ", fechaEntrega=" + fechaEntrega + ", tecnicoAsignado="
+                + tecnicoAsignado + ", repuestosUtilizados=" + repuestosUtilizados + ", getId()=" + getId()
+                + ", getIdTrabajo()=" + getIdTrabajo() + ", getVehiculo()=" + getVehiculo() + ", getServicio()="
+                + getServicio() + ", getFechaRecepcion()=" + getFechaRecepcion() + ", getFechaEntrega()="
+                + getFechaEntrega() + ", getTecnicoAsignado()=" + getTecnicoAsignado() + ", getRepuestosUtilizados()="
+                + getRepuestosUtilizados() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+                + ", toString()=" + super.toString() + "]";
     }
+
+   
+
 }
