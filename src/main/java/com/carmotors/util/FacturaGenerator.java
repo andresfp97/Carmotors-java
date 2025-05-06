@@ -6,6 +6,8 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FacturaGenerator {
     private static final Font TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
@@ -13,10 +15,13 @@ public class FacturaGenerator {
     private static final Font NORMAL_FONT = new Font(Font.FontFamily.HELVETICA, 10);
     private static final Font BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
 
-    public static void generarFactura(Factura factura) {
+    public static String generarFactura(Factura factura) { // Cambiamos el tipo de retorno a String
         Document document = new Document();
+        String rutaArchivo = ""; // Inicializamos la variable para almacenar la ruta
         try {
             String filename = "factura_" + factura.getNumeroFactura() + ".pdf";
+            Path path = Paths.get(filename); // Obtener la ruta del archivo
+            rutaArchivo = path.toAbsolutePath().toString(); // Convertir a ruta absoluta
             PdfWriter.getInstance(document, new FileOutputStream(filename));
             document.open();
 
@@ -38,7 +43,9 @@ public class FacturaGenerator {
             document.close();
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
+            return null; // Devolvemos null en caso de error
         }
+        return rutaArchivo; // Devolvemos la ruta del archivo generado
     }
 
     private static void addFooter(Document document, Factura factura) throws DocumentException {

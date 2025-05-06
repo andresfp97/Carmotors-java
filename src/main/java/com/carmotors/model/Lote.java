@@ -96,9 +96,14 @@ public class Lote {
     public String toString() {
         return "Lote [id=" + id + ", Idrepuesto=" + Idrepuesto + ", Idproveedor=" + Idproveedor + ", FechaIngreso="
                 + FechaIngreso + ", cantidadInicial=" + cantidadInicial + ", cantidadDisponible=" + cantidadDisponible
-                + ", estado=" + estado + "]";
+                + ", estado=" + estado + ", getId()=" + getId() + ", getIdrepuesto()=" + getIdrepuesto()
+                + ", getIdproveedor()=" + getIdproveedor() + ", getFechaIngreso()=" + getFechaIngreso()
+                + ", getCantidadInicial()=" + getCantidadInicial() + ", getCantidadDisponible()="
+                + getCantidadDisponible() + ", getEstado()=" + getEstado() + ", getClass()=" + getClass()
+                + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
     }
 
+   
     
 }
 

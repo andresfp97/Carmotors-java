@@ -4,6 +4,7 @@ import com.carmotors.model.DetalleTrabajoRepuesto;
 import com.carmotors.model.Lote;
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.Trabajo;
+import com.carmotors.model.enums.TipoRepuesto;
 import com.carmotors.util.Conexion;
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,74 +27,74 @@ public class DetalleTrabajoRepuestoDAO {
 
     // Método para agregar un nuevo detalle
     public boolean agregarDetalle(DetalleTrabajoRepuesto detalle) {
-    Connection con = null;
-    try {
-        con = Conexion.getConexion().getConnection();
-        con.setAutoCommit(false); // Iniciar transacción
+        Connection con = null;
+        try {
+            con = Conexion.getConexion().getConnection();
+            con.setAutoCommit(false); // Iniciar transacción
 
-        // 1. Validar datos antes de insertar
-        if (detalle.getTrabajo() == null || detalle.getLote() == null || detalle.getCantidadUsada() == null || 
-            detalle.getCantidadUsada() <= 0) {
-            throw new IllegalArgumentException("Datos del detalle inválidos");
-        }
-
-        // 2. Verificar stock disponible
-        if (!verificarStockDisponible(con, detalle.getLote().getId(), detalle.getCantidadUsada())) {
-            throw new SQLException("No hay suficiente stock disponible");
-        }
-
-        // 3. Insertar detalle
-        String sql = "INSERT INTO detalle_trabajo_repuesto (id_trabajo, id_lote, cantidad_usada) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, detalle.getTrabajo().getIdTrabajo());
-            pstmt.setInt(2, detalle.getLote().getId());
-            pstmt.setInt(3, detalle.getCantidadUsada());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("No se pudo insertar el detalle");
+            // 1. Validar datos antes de insertar
+            if (detalle.getTrabajo() == null || detalle.getLote() == null || detalle.getCantidadUsada() == null || 
+                detalle.getCantidadUsada() <= 0) {
+                throw new IllegalArgumentException("Datos del detalle inválidos");
             }
 
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    detalle.setIdDetalle(generatedKeys.getInt(1));
-                } else {
-                    throw new SQLException("No se obtuvo ID generado");
+            // 2. Verificar stock disponible
+            if (!verificarStockDisponible(con, detalle.getLote().getId(), detalle.getCantidadUsada())) {
+                throw new SQLException("No hay suficiente stock disponible");
+            }
+
+            // 3. Insertar detalle
+            String sql = "INSERT INTO detalle_trabajo_repuesto (id_trabajo, id_lote, cantidad_usada) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                pstmt.setInt(1, detalle.getTrabajo().getIdTrabajo());
+                pstmt.setInt(2, detalle.getLote().getId());
+                pstmt.setInt(3, detalle.getCantidadUsada());
+
+                int affectedRows = pstmt.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("No se pudo insertar el detalle");
+                }
+
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        detalle.setIdDetalle(generatedKeys.getInt(1));
+                    } else {
+                        throw new SQLException("No se obtuvo ID generado");
+                    }
+                }
+            }
+
+            // 4. Actualizar stock
+            actualizarStockLote(con, detalle.getLote(), detalle.getCantidadUsada());
+
+            con.commit(); // Confirmar transacción
+            LOGGER.log(Level.INFO, "Detalle agregado exitosamente con ID: {0}", detalle.getIdDetalle());
+            return true;
+
+        } catch (Exception e) {
+            if (con != null) {
+                try {
+                    con.rollback(); // Revertir en caso de error
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Error al hacer rollback", ex);
+                }
+            }
+            LOGGER.log(Level.SEVERE, "Error al agregar detalle: " + e.getMessage(), e);
+            JOptionPane.showMessageDialog(null, 
+                "Error al guardar detalle: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true); // Restaurar auto-commit
+                    con.close();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.WARNING, "Error al cerrar conexión", e);
                 }
             }
         }
-
-        // 4. Actualizar stock
-        actualizarStockLote(con, detalle.getLote(), detalle.getCantidadUsada());
-
-        con.commit(); // Confirmar transacción
-        LOGGER.log(Level.INFO, "Detalle agregado exitosamente con ID: {0}", detalle.getIdDetalle());
-        return true;
-
-    } catch (Exception e) {
-        if (con != null) {
-            try {
-                con.rollback(); // Revertir en caso de error
-            } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, "Error al hacer rollback", ex);
-            }
-        }
-        LOGGER.log(Level.SEVERE, "Error al agregar detalle: " + e.getMessage(), e);
-        JOptionPane.showMessageDialog(null, 
-            "Error al guardar detalle: " + e.getMessage(), 
-            "Error", JOptionPane.ERROR_MESSAGE);
-        return false;
-    } finally {
-        if (con != null) {
-            try {
-                con.setAutoCommit(true); // Restaurar auto-commit
-                con.close();
-            } catch (SQLException e) {
-                LOGGER.log(Level.WARNING, "Error al cerrar conexión", e);
-            }
-        }
     }
-}
 
 
     // Método para actualizar el stock del lote
@@ -125,9 +126,11 @@ public class DetalleTrabajoRepuestoDAO {
     // Método para obtener detalles por trabajo
     public List<DetalleTrabajoRepuesto> obtenerPorTrabajo(Trabajo trabajo) {
         List<DetalleTrabajoRepuesto> detalles = new ArrayList<>();
-        String sql = "SELECT d.*, l.id_lote, l.cantidad_disponible, l.id_repuesto " +
+        String sql = "SELECT d.*, l.id_lote, l.cantidad_disponible, l.id_repuesto, r.nombre_repuesto AS nombre_repuesto, r.tipo AS tipo_repuesto, " +
+                "r.marca AS marca_repuesto, r.modelo_compatible AS modelo_compatible_repuesto, r.vida_util_estimada AS vida_util_estimada_repuesto, r.precio AS precio_repuesto " + // Obtener todos los campos del repuesto
                 "FROM detalle_trabajo_repuesto d " +
                 "JOIN lote l ON d.id_lote = l.id_lote " +
+                "JOIN repuesto r ON l.id_repuesto = r.id_repuesto " +
                 "WHERE d.id_trabajo = ?";
 
         try (
@@ -151,10 +154,23 @@ public class DetalleTrabajoRepuestoDAO {
                 detalle.setLote(lote);
 
                 detalle.setCantidadUsada(rs.getInt("cantidad_usada"));
+
+                // Crear objeto Repuesto y asignar todos los valores
+                Repuesto repuesto = new Repuesto();
+                repuesto.setId(rs.getInt("id_repuesto"));
+                repuesto.setNombre(rs.getString("nombre_repuesto"));
+                repuesto.setTipo(TipoRepuesto.fromString(rs.getString("tipo_repuesto")));
+                repuesto.setMarca(rs.getString("marca_repuesto"));
+                repuesto.setModeloCompatible(rs.getString("modelo_compatible_repuesto"));
+                repuesto.setVidaUtilEstimada(rs.getDate("vida_util_estimada_repuesto"));
+                repuesto.setPrecio(rs.getDouble("precio_repuesto"));
+                
+                lote.setIdrepuesto(repuesto); // Asignar el objeto Repuesto al Lote
+                
                 detalles.add(detalle);
                 
-                LOGGER.log(Level.FINE, "Detalle cargado: ID {0}, Lote #{1}, Cantidad {2}", 
-                          new Object[]{detalle.getIdDetalle(), idLote, detalle.getCantidadUsada()});
+                LOGGER.log(Level.FINE, "Detalle cargado: ID {0}, Lote: {1}, Cantidad: {2}, Repuesto: {3}", 
+                        new Object[]{detalle.getIdDetalle(), lote, detalle.getCantidadUsada(), repuesto});
             }
             
             LOGGER.log(Level.INFO, "Se encontraron {0} detalles para el trabajo #{1}", 

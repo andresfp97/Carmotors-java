@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
 
 public class FacturaController {
     private static final double IVA = 0.19;
@@ -21,12 +23,9 @@ public class FacturaController {
 
     private final PanelFactura vista;
     private final FacturaDAO facturaDAO;
-
     private final ClienteDAO clienteDAO;
     private final TrabajoDAO trabajoDAO;
     private final VehiculoDAO vehiculoDAO;
-
-    // Cambiado a no-final para permitir modificación
     private ActionListener generarFacturaListener;
 
     public FacturaController(PanelFactura vista, FacturaDAO facturaDAO,
@@ -42,9 +41,11 @@ public class FacturaController {
         this.clienteDAO = clienteDAO;
         this.trabajoDAO = trabajoDAO;
         this.vehiculoDAO = vehiculoDAO;
-
-        // Configurar el listener por defecto
         this.setGenerarFacturaListener(e -> generarFacturaDesdeVista());
+        this.vista.setFacturaController(this); // Establecer el controlador en la vista
+        cargarFacturas(); // Cargar las facturas iniciales en la tabla
+        cargarTrabajosFacturables();
+
     }
 
     public void generarFactura(Trabajo trabajo) {
@@ -60,6 +61,7 @@ public class FacturaController {
                 generarFacturaVisual(factura);
                 vista.mostrarMensaje("Factura generada exitosamente");
                 vista.limpiarFormulario();
+                cargarFacturas(); // Actualizar la tabla de facturas después de generar una nueva
             } else {
                 vista.mostrarError("Error al guardar la factura en la base de datos");
             }
@@ -128,8 +130,8 @@ public class FacturaController {
         // Detalles para repuestos
         if (trabajo.getRepuestosUtilizados() != null) {
             for (DetalleTrabajoRepuesto detalleRepuesto : trabajo.getRepuestosUtilizados()) {
-                if (detalleRepuesto != null && detalleRepuesto.getLote() != null &&
-                        detalleRepuesto.getLote().getIdrepuesto() != null) {
+                if (detalleRepuesto != null && detalleRepuesto.getLote() != null
+                        && detalleRepuesto.getLote().getIdrepuesto() != null) {
 
                     DetalleFactura detalle = new DetalleFactura();
                     detalle.setIdFactura(factura.getIdFactura());
@@ -147,14 +149,6 @@ public class FacturaController {
 
     private void generarFacturaVisual(Factura factura) {
         try {
-            // Debug: Mostrar datos completos de la factura
-            System.out.println("[DEBUG] Datos completos de la factura:");
-            System.out.println("Número: " + factura.getNumeroFactura());
-            System.out.println(
-                    "Cliente: " + (factura.getIdCliente() != null ? factura.getIdCliente().getNombre() : "null"));
-            System.out.println("Fecha: " + factura.getFechaEmision());
-            System.out.println("Total: " + factura.getTotal());
-
             FacturaGenerator.generarFactura(factura);
             vista.mostrarFacturaGenerada(factura);
 
@@ -187,8 +181,7 @@ public class FacturaController {
 
     /**
      * Establece el listener para generar factura
-     * 
-     * @param listener El ActionListener a establecer
+     * * @param listener El ActionListener a establecer
      */
     public void setGenerarFacturaListener(ActionListener listener) {
         if (listener != null) {
@@ -206,13 +199,6 @@ public class FacturaController {
             cliente = clienteDAO.obtenerPorId(idCliente);
             trabajo.getVehiculo().setCliente(cliente);
         }
-
-        // Debug: Verificar datos del cliente
-        System.out.println("[DEBUG] Datos completos del cliente:");
-        System.out.println("Nombre: " + cliente.getNombre());
-        System.out.println("Identificación: " + cliente.getIdentificacion());
-        System.out.println("Teléfono: " + cliente.getTelefono());
-        System.out.println("Email: " + cliente.getCorreoElectronico());
 
         factura.setIdCliente(cliente);
         factura.setIdTrabajo(trabajo);
@@ -250,5 +236,39 @@ public class FacturaController {
             e.printStackTrace();
         }
         return consecutivo;
+    }
+
+    // Método para buscar factura por número de factura
+    public void buscarFacturaPorNumero(String numeroFactura) {
+        try {
+            Factura factura = facturaDAO.obtenerFacturaPorNumero(numeroFactura);
+            if (factura != null) {
+                List<Factura> listaUnicaFactura = new ArrayList<>();
+                listaUnicaFactura.add(factura);
+                vista.setFacturas(listaUnicaFactura);
+            } else {
+                vista.mostrarError("Factura no encontrada");
+                cargarFacturas();
+            }
+        } catch (Exception e) {
+            vista.mostrarError("Error al buscar factura: " + e.getMessage());
+        }
+    }
+
+    // Método para eliminar factura por número de factura
+    public void eliminarFacturaPorNumero(String numeroFactura) {
+        try {
+            String resultado = facturaDAO.eliminarFacturaPorNumero(numeroFactura);
+            vista.mostrarMensaje(resultado);
+            cargarFacturas(); // Actualizar la tabla después de la eliminación
+        } catch (Exception e) {
+            vista.mostrarError("Error al eliminar factura: " + e.getMessage());
+        }
+    }
+
+    // Método para cargar todas las facturas
+    public void cargarFacturas() {
+        List<Factura> facturas = facturaDAO.obtenerTodos();
+        vista.setFacturas(facturas);
     }
 }

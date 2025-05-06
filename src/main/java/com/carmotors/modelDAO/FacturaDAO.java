@@ -200,4 +200,41 @@ public class FacturaDAO {
         }
         return trabajos;
     }
+
+    public String eliminarFacturaPorNumero(String numeroFactura) {
+        String sql = "DELETE FROM factura WHERE numero_factura = ?";
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, numeroFactura);
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0 ? "Factura eliminada exitosamente" : "Factura no encontrada";
+        } catch (SQLException e) {
+            LOGGER.severe("Error al eliminar factura: " + e.getMessage());
+            return "Error al eliminar factura";
+        }
+    }
+
+    public Factura obtenerFacturaPorNumero(String numeroFactura) {
+        String sql = "SELECT * FROM factura WHERE numero_factura = ?";
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, numeroFactura);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Factura factura = new Factura();
+                factura.setIdFactura(rs.getInt("id_factura"));
+                factura.setNumeroFactura(rs.getString("numero_factura"));
+                factura.setFechaEmision(rs.getDate("fecha_emision").toLocalDate());
+                factura.setSubtotal(rs.getDouble("subtotal"));
+                factura.setImpuestos(rs.getDouble("impuestos"));
+                factura.setTotal(rs.getDouble("total"));
+                factura.setQrCodigo(rs.getString("qr_codigo"));
+                return factura;
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error al obtener factura por número: " + e.getMessage());
+        }
+        return null;
+    }
+    
 }

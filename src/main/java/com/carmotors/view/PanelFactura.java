@@ -7,19 +7,21 @@ import com.carmotors.modelDAO.TrabajoDAO;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.ArrayList;
 
 public class PanelFactura extends JPanel {
     private JComboBox<Trabajo> cbTrabajos;
-    private JButton btnGenerar, btnBuscar, btnEliminar, btnLimpiar;
+    private JButton btnGenerarFactura;
     private JTextArea txtDetalleFactura;
     private FacturaController facturaController;
     private TrabajoDAO trabajoDAO;
     private ActionListener generarFacturaListener;
-    private JTable tablaFacturas;
-    private DefaultTableModel modeloTablaFacturas;
+    private JTable tablaFacturas;  // Agregamos la tabla para mostrar las facturas
+    private DefaultTableModel modeloTablaFacturas; //y su modelo
 
     public PanelFactura() {
         setLayout(new BorderLayout());
@@ -29,25 +31,9 @@ public class PanelFactura extends JPanel {
     }
 
     private void initComponents() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        // ======================= TAB 1: FORMULARIO FACTURA =======================
-        JPanel tabFormulario = new JPanel();
-        tabFormulario.setLayout(new BorderLayout());
-        tabFormulario.setBackground(new Color(240, 240, 240));
-
-        // Panel del formulario
-        JPanel panelFormulario = new JPanel();
-        panelFormulario.setLayout(new BoxLayout(panelFormulario, BoxLayout.Y_AXIS));
-        panelFormulario.setBackground(Color.WHITE);
-        panelFormulario.setBorder(createStyledBorder("Generar Factura"));
-
-        JPanel formContent = new JPanel(new GridBagLayout());
-        formContent.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.setBackground(Color.WHITE);
+        panelSuperior.setBorder(createStyledBorder("Seleccionar Trabajo"));
 
         JLabel lblTrabajo = new JLabel("Trabajo:");
         lblTrabajo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -69,66 +55,38 @@ public class PanelFactura extends JPanel {
                 return this;
             }
         });
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0;
-        formContent.add(lblTrabajo, gbc);
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        formContent.add(cbTrabajos, gbc);
 
-        panelFormulario.add(formContent);
+        btnGenerarFactura = createStyledButton("Generar Factura", new Color(70, 130, 180));
 
-        // Panel de botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBackground(Color.WHITE);
-        btnGenerar = createStyledButton("Generar Factura", new Color(76, 175, 80));
-        buttonPanel.add(btnGenerar);
-        panelFormulario.add(Box.createRigidArea(new Dimension(0, 10)));
-        panelFormulario.add(buttonPanel);
+        panelSuperior.add(lblTrabajo);
+        panelSuperior.add(cbTrabajos);
+        panelSuperior.add(btnGenerarFactura);
 
-        tabFormulario.add(panelFormulario, BorderLayout.NORTH);
-
-        // ======================= TAB 2: LISTADO DE FACTURAS =======================
-        JPanel panelTabla = new JPanel(new BorderLayout());
-        panelTabla.setBorder(createStyledBorder("Registros de Facturas"));
-        panelTabla.setBackground(Color.WHITE);
-
-        // Panel de búsqueda
-        JPanel buscarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buscarPanel.setBackground(Color.WHITE);
-        buscarPanel.add(new JLabel("Buscar por Número de Factura:"));
-        JTextField txtBuscar = createStyledTextField(10);
-        buscarPanel.add(txtBuscar);
-        btnBuscar = createStyledButton("Buscar", new Color(33, 150, 243));
-        btnEliminar = createStyledButton("Eliminar", new Color(244, 67, 54));
-        btnLimpiar = createStyledButton("Limpiar búsqueda", new Color(255, 193, 7));
-        buscarPanel.add(btnBuscar);
-        buscarPanel.add(btnEliminar);
-        buscarPanel.add(btnLimpiar);
-
-        panelTabla.add(buscarPanel, BorderLayout.NORTH);
-
-        // Tabla de facturas
-        modeloTablaFacturas = new DefaultTableModel(
-                new Object[]{"Número", "Fecha", "Cliente", "Subtotal", "Impuestos", "Total", "CUFE"}, 0);
-        tablaFacturas = new JTable(modeloTablaFacturas);
-        panelTabla.add(new JScrollPane(tablaFacturas), BorderLayout.CENTER);
-
-        tabFormulario.add(panelTabla, BorderLayout.CENTER);
-
-        // Área de texto para mostrar la factura detallada (inicialmente oculta en la primera pestaña)
         txtDetalleFactura = new JTextArea();
         txtDetalleFactura.setEditable(false);
         txtDetalleFactura.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPaneDetalle = new JScrollPane(txtDetalleFactura);
         scrollPaneDetalle.setBorder(createStyledBorder("Detalle de Factura"));
-        tabFormulario.add(scrollPaneDetalle, BorderLayout.SOUTH); // Añadido al sur de la primera pestaña
 
-        // Añadir pestañas
-        tabbedPane.addTab("Generar Factura", tabFormulario);
-        tabbedPane.addTab("Listado de Facturas", panelTabla); // Reutilizamos el panelTabla aquí
-        add(tabbedPane, BorderLayout.CENTER);
+        // Crear tabla para mostrar facturas
+        JPanel panelTablaFacturas = new JPanel(new BorderLayout());
+        panelTablaFacturas.setBorder(createStyledBorder("Facturas Generadas"));
+        panelTablaFacturas.setBackground(Color.WHITE);
+
+        modeloTablaFacturas = new DefaultTableModel(
+                new Object[]{"ID Factura", "Número Factura", "Fecha Emisión", "Total"}, 0);
+        tablaFacturas = new JTable(modeloTablaFacturas);
+        JScrollPane scrollPaneTabla = new JScrollPane(tablaFacturas);
+        panelTablaFacturas.add(scrollPaneTabla, BorderLayout.CENTER);
+
+        // Crear un panel para organizar los componentes verticalmente
+        JPanel panelContenedor = new JPanel();
+        panelContenedor.setLayout(new BoxLayout(panelContenedor, BoxLayout.Y_AXIS));
+        panelContenedor.add(panelSuperior);       // Agregar el panel superior primero
+        panelContenedor.add(scrollPaneDetalle);  // Luego el detalle
+        panelContenedor.add(panelTablaFacturas); // Y finalmente la tabla
+
+        add(panelContenedor, BorderLayout.CENTER); // Agregar el panel contenedor al centro del PanelFactura
     }
 
     public Trabajo getTrabajoSeleccionado() {
@@ -157,9 +115,10 @@ public class PanelFactura extends JPanel {
     public void limpiarFormulario() {
         cbTrabajos.setSelectedIndex(-1);
         txtDetalleFactura.setText("");
+        modeloTablaFacturas.setRowCount(0); // Limpiar la tabla de facturas
     }
 
-    public void mostrarFacturaGenerada(Factura factura) {
+  public void mostrarFacturaGenerada(Factura factura) {
         String detalle = String.format(
                 "========================================\n" +
                         "      TALLER AUTOMOTRIZ MOTORES & RUEDAS\n" +
@@ -199,6 +158,14 @@ public class PanelFactura extends JPanel {
                 factura.getTotal());
 
         txtDetalleFactura.setText(detalle);
+
+        // Agregar la factura a la tabla
+        modeloTablaFacturas.addRow(new Object[]{
+                factura.getIdFactura(),
+                factura.getNumeroFactura(),
+                factura.getFechaEmision(),
+                factura.getTotal()
+        });
     }
 
     public void setFacturaController(FacturaController facturaController) {
@@ -210,8 +177,8 @@ public class PanelFactura extends JPanel {
             });
         }
 
-        if (btnGenerar != null && this.facturaController != null) {
-            btnGenerar.addActionListener(e -> {
+        if (btnGenerarFactura != null && this.facturaController != null) {
+            btnGenerarFactura.addActionListener(e -> {
                 facturaController.generarFacturaDesdeVista();
             });
         }
@@ -219,8 +186,8 @@ public class PanelFactura extends JPanel {
 
     public void setGenerarFacturaListener(ActionListener listener) {
         this.generarFacturaListener = listener;
-        if (btnGenerar != null && listener != null) {
-            btnGenerar.addActionListener(listener);
+        if (btnGenerarFactura != null && listener != null) {
+            btnGenerarFactura.addActionListener(listener);
         }
     }
 
@@ -228,16 +195,7 @@ public class PanelFactura extends JPanel {
         this.trabajoDAO = trabajoDAO;
     }
 
-    // Métodos auxiliares para estilos
-    private JTextField createStyledTextField(int columns) {
-        JTextField field = new JTextField(columns);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
-        return field;
-    }
-
+    // Métodos auxiliares para estilos (los mismos que en PanelCliente)
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -258,4 +216,31 @@ public class PanelFactura extends JPanel {
                 new Font("Segoe UI", Font.BOLD, 13),
                 new Color(70, 70, 70));
     }
+
+    private void addFormRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JComponent field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.weightx = 0;
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        panel.add(label, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panel.add(field, gbc);
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        // Limpiar la tabla antes de agregar nuevas facturas
+        modeloTablaFacturas.setRowCount(0);
+        for (Factura factura : facturas) {
+            modeloTablaFacturas.addRow(new Object[]{
+                    factura.getIdFactura(),
+                    factura.getNumeroFactura(),
+                    factura.getFechaEmision(),
+                    factura.getTotal()
+            });
+        }
+    }
 }
+
