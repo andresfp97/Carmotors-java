@@ -2,29 +2,30 @@ package com.carmotors.controller;
 
 import com.carmotors.model.ClienteActividad;
 import com.carmotors.modelDAO.ClienteActividadDAO;
-import com.carmotors.view.PanelClienteActividad;
+import com.carmotors.view.PanelActividadEspecial;
+
 
 
 import javax.swing.*;
 
 public class ClienteActividadController {
     private ClienteActividadDAO clienteActividadDAO;
-    private PanelClienteActividad vista;
+    private PanelActividadEspecial vista;
 
-    public ClienteActividadController ( PanelClienteActividad vista, ClienteActividadDAO clienteActividadDAO) {
+    public ClienteActividadController ( PanelActividadEspecial vista, ClienteActividadDAO clienteActividadDAO) {
         this.clienteActividadDAO = clienteActividadDAO;
         this.vista = vista;
-        this.vista.setGuardarListener(e -> guardarClienteActividad());
+        this.vista.setGuardarListenerClienteActividad(e -> guardarClienteActividad());
     }
 
     private void guardarClienteActividad() {
         try {
-            ClienteActividad clienteActividad = vista.getDatosFormulario();
+            ClienteActividad clienteActividad = vista.getDatosFormularioClienteActividad();
             boolean exito = clienteActividadDAO.agregar(clienteActividad);  // Capturamos el resultado booleano
 
             if(exito) {
                 JOptionPane.showMessageDialog(vista, "Cliente Actividad guardado correctamente");
-                vista.limpiarFormulario();
+                vista.limpiarFormularioClienteActividad();
             } else {
                 JOptionPane.showMessageDialog(vista, "No se pudo guardar el Cliente en la Actividad");
             }
@@ -35,7 +36,7 @@ public class ClienteActividadController {
     }
     public void cargarClienteActividad(ClienteActividad clienteActividad) {
         if (clienteActividad != null) {
-            vista.setDatosFormulario(clienteActividad);
+            vista.setDatosFormularioClienteActividad(clienteActividad);
         }
     }
 }
