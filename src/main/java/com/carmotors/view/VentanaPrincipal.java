@@ -225,6 +225,7 @@ public class VentanaPrincipal extends JFrame {
                 if (panelVehiculo != null) {
                         panelVehiculo.cargarClientes(clientes);
                 }
+
         }
 
         public void actualizarListaProveedores(java.util.List<Proveedor> proveedores) {
