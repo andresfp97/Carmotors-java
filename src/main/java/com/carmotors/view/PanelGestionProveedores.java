@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.List;
 
+import com.carmotors.model.enums.FrecuenciaVisitas;
+
 public class PanelGestionProveedores extends JPanel {
 
     private JTextField txtNombre, txtNit, txtContacto, txtBuscarProveedor, txtpuntualidad, txtCalidadProducto, txtCosto,
@@ -33,6 +35,7 @@ public class PanelGestionProveedores extends JPanel {
     private JComboBox<PanelGestionProveedores.ProveedorCombo> cbProveedores;
     private ProveedorDAO proveedorDAO = new ProveedorDAO();
     private EvaluacionProveedorDAO evaluacionProveedorDAO = new EvaluacionProveedorDAO();
+    
 
     public PanelGestionProveedores() {
         setLayout(new BorderLayout());
@@ -486,7 +489,7 @@ public class PanelGestionProveedores extends JPanel {
         proveedor.setNit(txtNit.getText());
         proveedor.setContacto(txtContacto.getText());
         try {
-            proveedor.setFrecuenciaVisitas(Integer.parseInt(txtFrecuencia.getText()));
+            proveedor.setFrecuenciaVisitas(FrecuenciaVisitas.fromString(txtFrecuencia.getText()));
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Por favor ingrese una frecuencia de visitas válida", "Error", JOptionPane.ERROR_MESSAGE);
             throw e;

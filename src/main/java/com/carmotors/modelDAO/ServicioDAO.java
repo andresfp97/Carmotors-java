@@ -12,6 +12,7 @@ import java.util.List;
 public class ServicioDAO {
 
     public ServicioDAO() {
+        
     }
 
     public boolean agregar(Servicio servicio) {

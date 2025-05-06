@@ -2,6 +2,7 @@ package com.carmotors.view;
 
 import com.carmotors.model.enums.EstadoLote;
 import com.carmotors.model.Lote;
+import com.carmotors.model.Proveedor;
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.TipoRepuesto;
 import com.carmotors.modelDAO.LoteDAO;
@@ -209,9 +210,11 @@ public class PanelRepuesto extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         addFormRow(formSuperior, gbc, 0, "Nombre:", txtNombre = createStyledTextField(15));
-        addFormRow(formSuperior, gbc, 1, "Tipo:", txtTipo = createStyledComboBox(new String[]{"Mecanico", "Electrico", "Carroceria", "Consumo"}));
+        addFormRow(formSuperior, gbc, 1, "Tipo:",
+                txtTipo = createStyledComboBox(new String[] { "Mecanico", "Electrico", "Carroceria", "Consumo" }));
         addFormRow(formSuperior, gbc, 2, "Marca:", txtMarca = createStyledTextField(15));
         addFormRow(formSuperior, gbc, 3, "Modelo Compatible:", txtModelo = createStyledTextField(15));
+        addFormRow(formSuperior, gbc, 4, "Precio:", txtPrecio = createStyledTextField(15));
         addFormRow(formSuperior, gbc, 4, "Precio:", txtPrecio = createStyledTextField(15));
 
         UtilDateModel model = new UtilDateModel();
@@ -291,7 +294,8 @@ public class PanelRepuesto extends JPanel {
         addFormRow(formInferior, gbc, 2, "Fecha Ingreso:", datePanelWrapper2);
         addFormRow(formInferior, gbc, 3, "Cantidad Inicial:", txtCatidadInicial = createStyledTextField(15));
         addFormRow(formInferior, gbc, 4, "Cantidad Disponible:", txtCatidadDisponible = createStyledTextField(15));
-        addFormRow(formInferior, gbc, 5, "Estado:", txtEstado = createStyledComboBox(new String[]{"Disponible", "Reservado", "Fuera de servicio"}));
+        addFormRow(formInferior, gbc, 5, "Estado:",
+                txtEstado = createStyledComboBox(new String[] { "Disponible", "Reservado", "Fuera de servicio" }));
 
         panelInferior.add(formInferior);
 
@@ -341,8 +345,7 @@ public class PanelRepuesto extends JPanel {
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)
-        ));
+                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
         return field;
     }
 
@@ -352,8 +355,7 @@ public class PanelRepuesto extends JPanel {
         combo.setBackground(Color.WHITE);
         combo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(2, 8, 2, 8)
-        ));
+                BorderFactory.createEmptyBorder(2, 8, 2, 8)));
         return combo;
     }
 
@@ -363,8 +365,7 @@ public class PanelRepuesto extends JPanel {
         field.setColumns(10);
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)
-        ));
+                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
         return field;
     }
 
@@ -386,8 +387,7 @@ public class PanelRepuesto extends JPanel {
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
                 new Font("Segoe UI", Font.BOLD, 13),
-                new Color(70, 70, 70)
-        );
+                new Color(70, 70, 70));
         return border;
     }
 
@@ -464,8 +464,7 @@ public class PanelRepuesto extends JPanel {
             LocalDate localDate = LocalDate.of(
                     datePickerVidaUtil.getModel().getYear(),
                     datePickerVidaUtil.getModel().getMonth() + 1,
-                    datePickerVidaUtil.getModel().getDay()
-            );
+                    datePickerVidaUtil.getModel().getDay());
             r.setVidaUtilEstimada(java.sql.Date.valueOf(localDate));
         } else {
             r.setVidaUtilEstimada(null);
@@ -476,8 +475,13 @@ public class PanelRepuesto extends JPanel {
 
     public Lote getDatosFormularioLote() {
         Lote r = new Lote();
-        r.setIdrepuesto(Integer.valueOf(txtIdRepuesto.getText()));
-        r.setIdproveedor(Integer.valueOf(txtIdProveedor.getText()));
+        Repuesto repuesto = new Repuesto();
+        Proveedor proveedor = new Proveedor();
+
+        repuesto.setId(Integer.valueOf(txtIdRepuesto.getText()));
+        proveedor.setId(Integer.valueOf(txtIdProveedor.getText()));
+        r.setIdrepuesto(repuesto);
+        r.setIdproveedor(proveedor);
 
         if (datePickerFechaIngreso.getModel().isSelected()) {
             Calendar cal = Calendar.getInstance();
@@ -510,12 +514,12 @@ public class PanelRepuesto extends JPanel {
         txtMarca.setText("");
         txtModelo.setText("");
         txtPrecio.setText("");
+        txtPrecio.setText("");
 
         // Limpiar el datePicker correctamente
         datePickerVidaUtil.getModel().setValue(null);
         datePickerVidaUtil.getModel().setSelected(false);
         datePickerVidaUtil.getJFormattedTextField().setText("");
-
 
         datePickerFechaIngreso.getModel().setValue(null);
         datePickerFechaIngreso.getModel().setSelected(false);
@@ -542,7 +546,7 @@ public class PanelRepuesto extends JPanel {
         txtTipo.setSelectedItem(repuesto.getTipo().toString().toLowerCase());
         txtMarca.setText(repuesto.getMarca());
         txtModelo.setText(repuesto.getModeloCompatible());
-        txtPrecio.setText(String.valueOf(repuesto.getPrecio())); // Nuevo campo
+        txtPrecio.setText(String.valueOf(repuesto.getPrecio()));
 
         // Manejo seguro de la fecha
         if (repuesto.getVidaUtilEstimada() != null) {
@@ -551,8 +555,7 @@ public class PanelRepuesto extends JPanel {
             datePickerVidaUtil.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)
-            );
+                    cal.get(Calendar.DAY_OF_MONTH));
             datePickerVidaUtil.getModel().setSelected(true);
         } else {
             datePickerVidaUtil.getModel().setValue(null);
@@ -569,8 +572,7 @@ public class PanelRepuesto extends JPanel {
             datePickerFechaIngreso.getModel().setDate(
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)
-            );
+                    cal.get(Calendar.DAY_OF_MONTH));
             datePickerFechaIngreso.getModel().setSelected(true);
         } else {
             datePickerFechaIngreso.getModel().setValue(null);

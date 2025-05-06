@@ -2,6 +2,7 @@ package com.carmotors.modelDAO;
 
 import com.carmotors.model.EvaluacionProveedor;
 import com.carmotors.model.Proveedor;
+import com.carmotors.util.Conexion;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -11,27 +12,15 @@ import java.util.List;
 
 public class EvaluacionProveedorDAO implements CrudDAO<EvaluacionProveedor> {
 
-    private final HikariDataSource dataSource;
 
     public EvaluacionProveedorDAO() {
-        // Configuración directa de HikariCP
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
-        config.setUsername("root");
-        config.setPassword("root");
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        config.setMaximumPoolSize(10);
-        config.setConnectionTimeout(5000);
-        config.setIdleTimeout(600000);
-
-        this.dataSource = new HikariDataSource(config);
     }
     @Override
     public boolean agregar(EvaluacionProveedor evaluacionProveedor) {
         String sql = "INSERT INTO evaluacion_proveedor (id_proveedor, fecha_evaluacion, puntualidad, calidad_producto, costo, observaciones) VALUES (?,?,?,?,?,?)";
 
-        try (Connection con = dataSource.getConnection();
+        try (Connection con = Conexion.getConexion().getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setInt(1, evaluacionProveedor.getProveedor().getId());
@@ -56,7 +45,7 @@ public class EvaluacionProveedorDAO implements CrudDAO<EvaluacionProveedor> {
                 "WHERE ep.id_evaluacion = ?";
         EvaluacionProveedor evaluacion = null;
 
-        try (Connection con = dataSource.getConnection();
+        try (Connection con = Conexion.getConexion().getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setInt(1, idEvaluacion);
@@ -75,7 +64,7 @@ public class EvaluacionProveedorDAO implements CrudDAO<EvaluacionProveedor> {
     public String eliminarPorId(Integer id) {
         String sql = "DELETE FROM evaluacion_proveedor WHERE id_evaluacion = ?";
 
-        try (Connection con = dataSource.getConnection();
+        try (Connection con = Conexion.getConexion().getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
@@ -101,7 +90,7 @@ public class EvaluacionProveedorDAO implements CrudDAO<EvaluacionProveedor> {
                 "FROM evaluacion_proveedor ep " +
                 "LEFT JOIN proveedor p ON ep.id_proveedor = p.id_proveedor";
 
-        try (Connection con = dataSource.getConnection();
+        try (Connection con = Conexion.getConexion().getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 

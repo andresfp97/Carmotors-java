@@ -34,6 +34,9 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
             DetalleTrabajoRepuestoDAO detalleTrabajoDAO = new DetalleTrabajoRepuestoDAO();
             EvaluacionProveedorDAO epdao = new EvaluacionProveedorDAO();
 
+            FacturaDAO facturaDAO = new FacturaDAO();
+            DetalleFacturaDAO detalleFacturaDAO = new DetalleFacturaDAO();
+
             // Debug inicial
             System.out.println("=== DEBUG INICIAL ===");
             System.out.println("Probando conexión y obtención de clientes...");
@@ -55,7 +58,10 @@ public class ProyectoJAVA_CarMotors_AndersonAndresAda {
                     detalleTrabajoDAO,
                     aedao,
                     cadao,
-                    epdao
+                    epdao,
+                    facturaDAO
+               
+            
                     // Temporalmente null, lo seteamos después
             );
 

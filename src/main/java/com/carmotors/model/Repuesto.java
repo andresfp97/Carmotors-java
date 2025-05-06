@@ -33,6 +33,7 @@ public class Repuesto {
         this.modeloCompatible = modeloCompatible;
         this.vidaUtilEstimada = vidaUtilEstimada;
         this.precio = precio;
+        this.precio = precio;
     }
 
     public Integer getId() {
@@ -91,18 +92,6 @@ public class Repuesto {
         this.precio = precio;
     }
 
-    @Override
-    public String toString() {
-        return "Repuesto{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", tipo=" + tipo +
-                ", marca='" + marca + '\'' +
-                ", modeloCompatible='" + modeloCompatible + '\'' +
-                ", vidaUtilEstimada=" + vidaUtilEstimada +
-                ", precio=" + precio +
-                '}';
-    }
 
     public boolean estaPorVencer() {
         if (vidaUtilEstimada == null) return false;
@@ -112,6 +101,19 @@ public class Repuesto {
 
         return !vidaUtilEstimada.after(tresMesesDespues) && !vidaUtilEstimada.before(ahora);
     }
+
+    @Override
+    public String toString() {
+        return "Repuesto [id=" + id + ", nombre=" + nombre + ", tipo=" + tipo + ", marca=" + marca
+                + ", modeloCompatible=" + modeloCompatible + ", vidaUtilEstimada=" + vidaUtilEstimada + ", precio="
+                + precio + ", getId()=" + getId() + ", getNombre()=" + getNombre() + ", getTipo()=" + getTipo()
+                + ", getMarca()=" + getMarca() + ", getModeloCompatible()=" + getModeloCompatible()
+                + ", getVidaUtilEstimada()=" + getVidaUtilEstimada() + ", getPrecio()=" + getPrecio()
+                + ", estaPorVencer()=" + estaPorVencer() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+                + ", toString()=" + super.toString() + "]";
+    }
+
+    
 
     
 }

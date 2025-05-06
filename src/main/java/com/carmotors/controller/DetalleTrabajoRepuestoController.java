@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList; // Importar ArrayList
 
 public class DetalleTrabajoRepuestoController {
     private static final Logger LOGGER = Logger.getLogger(DetalleTrabajoRepuestoController.class.getName());
@@ -84,7 +85,7 @@ public class DetalleTrabajoRepuestoController {
                 cargarDetallesExistentes();
             } else {
                 LOGGER.log(Level.INFO, "No se seleccionó ningún trabajo válido");
-                vista.mostrarDetalles(null);
+                vista.mostrarDetalles(new ArrayList<>()); // Pasar lista vacía en lugar de null
             }
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Error al seleccionar trabajo", ex);
@@ -120,7 +121,7 @@ public class DetalleTrabajoRepuestoController {
                               new Object[]{detalles.size(), trabajoActual.getIdTrabajo()});
                 } else {
                     LOGGER.log(Level.WARNING, "La lista de detalles es nula");
-                    vista.mostrarDetalles(null);
+                    vista.mostrarDetalles(new ArrayList<>()); // Pasar lista vacía en lugar de null
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error al cargar detalles del trabajo", e);
@@ -327,3 +328,4 @@ public class DetalleTrabajoRepuestoController {
         LOGGER.log(Level.CONFIG, "Nuevo callback configurado en DetalleTrabajoRepuestoController");
     }
 }
+

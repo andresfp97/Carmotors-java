@@ -1,8 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.carmotors.model;
+
+import com.carmotors.model.enums.FrecuenciaVisitas;
 
 /**
  *
@@ -13,12 +12,12 @@ public class Proveedor {
     private String nombre;
     private String nit;
     private String contacto;
-    private Integer frecuenciaVisitas;   
+    private FrecuenciaVisitas frecuenciaVisitas;   
 
     public Proveedor() {
     }
 
-    public Proveedor(Integer id, String nombre, String nit, String coctacto, Integer frecuenciaVisitas) {
+    public Proveedor(Integer id, String nombre, String nit, String coctacto, FrecuenciaVisitas frecuenciaVisitas) {
         this.id = id;
         this.nombre = nombre;
         this.nit = nit;
@@ -58,18 +57,22 @@ public class Proveedor {
         this.contacto = coctacto;
     }
 
-    public Integer getFrecuenciaVisitas() {
+    public FrecuenciaVisitas getFrecuenciaVisitas() {
         return frecuenciaVisitas;
     }
 
-    public void setFrecuenciaVisitas(Integer frecuenciaVisitas) {
+    public void setFrecuenciaVisitas(FrecuenciaVisitas frecuenciaVisitas) {
         this.frecuenciaVisitas = frecuenciaVisitas;
     }
 
     @Override
     public String toString() {
-        return "Proveedor{" + "id=" + id + ", nombre=" + nombre + ", nit=" + nit + ", coctacto=" + contacto + ", frecuenciaVisitas=" + frecuenciaVisitas + '}';
+        return "Proveedor [id=" + id + ", nombre=" + nombre + ", nit=" + nit + ", contacto=" + contacto
+                + ", frecuenciaVisitas=" + frecuenciaVisitas + "]";
     }
+
+
+
     
     
 }

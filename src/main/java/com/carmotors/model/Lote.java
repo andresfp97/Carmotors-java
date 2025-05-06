@@ -15,8 +15,8 @@ import java.util.Date;
 public class Lote {
 
     private Integer id;
-    private Integer Idrepuesto;
-    private Integer Idproveedor;
+    private Repuesto Idrepuesto;
+    private Proveedor Idproveedor;
     private Date FechaIngreso;
     private Integer cantidadInicial;
     private Integer cantidadDisponible;
@@ -26,7 +26,7 @@ public class Lote {
     public Lote() {
     }
 
-    public Lote(Integer id, Integer idrepuesto, Integer idproveedor, Date fechaIngreso, Integer cantidadInicial, Integer cantidadDisponible, EstadoLote estado) {
+    public Lote(Integer id, Repuesto idrepuesto, Proveedor idproveedor, Date fechaIngreso, Integer cantidadInicial, Integer cantidadDisponible, EstadoLote estado) {
         this.id = id;
         this.Idrepuesto = idrepuesto;
         this.Idproveedor = idproveedor;
@@ -44,19 +44,19 @@ public class Lote {
         this.id = id;
     }
 
-    public Integer getIdrepuesto() {
+    public Repuesto getIdrepuesto() {
         return Idrepuesto;
     }
 
-    public void setIdrepuesto(Integer idrepuesto) {
+    public void setIdrepuesto(Repuesto idrepuesto) {
         Idrepuesto = idrepuesto;
     }
 
-    public Integer getIdproveedor() {
+    public Proveedor getIdproveedor() {
         return Idproveedor;
     }
 
-    public void setIdproveedor(Integer idproveedor) {
+    public void setIdproveedor(Proveedor idproveedor) {
         Idproveedor = idproveedor;
     }
 
@@ -94,15 +94,16 @@ public class Lote {
 
     @Override
     public String toString() {
-        return "Lote{" +
-                "id=" + id +
-                ", Idrepuesto=" + Idrepuesto +
-                ", Idproveedor=" + Idproveedor +
-                ", FechaIngreso=" + FechaIngreso +
-                ", cantidadInicial=" + cantidadInicial +
-                ", cantidadDisponible=" + cantidadDisponible +
-                ", estado=" + estado +
-                '}';
+        return "Lote [id=" + id + ", Idrepuesto=" + Idrepuesto + ", Idproveedor=" + Idproveedor + ", FechaIngreso="
+                + FechaIngreso + ", cantidadInicial=" + cantidadInicial + ", cantidadDisponible=" + cantidadDisponible
+                + ", estado=" + estado + ", getId()=" + getId() + ", getIdrepuesto()=" + getIdrepuesto()
+                + ", getIdproveedor()=" + getIdproveedor() + ", getFechaIngreso()=" + getFechaIngreso()
+                + ", getCantidadInicial()=" + getCantidadInicial() + ", getCantidadDisponible()="
+                + getCantidadDisponible() + ", getEstado()=" + getEstado() + ", getClass()=" + getClass()
+                + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
     }
+
+   
+    
 }
 

@@ -3,10 +3,15 @@ package com.carmotors.view;
 import com.carmotors.model.Lote;
 import com.carmotors.model.Trabajo;
 import com.carmotors.model.DetalleTrabajoRepuesto;
+import com.carmotors.model.Repuesto; // Importar la clase Repuesto
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects; // Importar Objects para el método equals y hashCode
+
 
 public class PanelDetalleTrabajoRepuesto extends JPanel {
     private JComboBox<TrabajoCombo> cbTrabajos;
@@ -19,10 +24,12 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
 
     private JTextField txtLote;
     private JButton btnBuscarLote;
+    private List<Lote> listaLotes; // Mantener una lista de lotes
 
     public PanelDetalleTrabajoRepuesto() {
         setLayout(new BorderLayout());
         initComponents();
+        this.listaLotes = new ArrayList<>(); // Inicializar la lista de lotes
     }
 
     private void initComponents() {
@@ -89,7 +96,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         // Panel central (tabla de detalles)
         JPanel panelTabla = new JPanel(new BorderLayout());
         panelTabla.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        
+
         tblDetalles = new JTable();
         JScrollPane scrollPane = new JScrollPane(tblDetalles);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Repuestos utilizados"));
@@ -106,8 +113,20 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         add(panelFormulario, BorderLayout.NORTH);
         add(panelTabla, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
+        
+        // Agregar panel de busqueda de Lote.
+        JPanel panelBusquedaLote = new JPanel(new BorderLayout(10,0));
+        panelBusquedaLote.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        JLabel lblBuscarLote = new JLabel("Buscar Lote:");
+        lblBuscarLote.setPreferredSize(new Dimension(150,25));
+        txtLote = new JTextField();
+        btnBuscarLote = new JButton("Buscar");
+        panelBusquedaLote.add(lblBuscarLote, BorderLayout.WEST);
+        panelBusquedaLote.add(txtLote, BorderLayout.CENTER);
+        panelBusquedaLote.add(btnBuscarLote, BorderLayout.EAST);
+        panelFormulario.add(panelBusquedaLote, 2); // Insertar en la posición 2
     }
-    
+
     private void configurarComboTrabajos() {
         cbTrabajos.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -121,14 +140,14 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
                 return this;
             }
         });
-        
+
         // Añadir listener para debug
         cbTrabajos.addActionListener(e -> {
             TrabajoCombo seleccionado = (TrabajoCombo) cbTrabajos.getSelectedItem();
             System.out.println("Trabajo seleccionado: " + (seleccionado != null ? seleccionado.getId() : "null"));
         });
     }
-    
+
     private void configurarComboLotes() {
         cbLotes.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -142,7 +161,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
                 return this;
             }
         });
-        
+
         // Añadir listener para debug
         cbLotes.addActionListener(e -> {
             LoteCombo seleccionado = (LoteCombo) cbLotes.getSelectedItem();
@@ -162,7 +181,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         public TrabajoCombo(Trabajo trabajo) {
             this.trabajo = trabajo;
             this.id = trabajo.getIdTrabajo();
-            this.displayText = "Trabajo #" + trabajo.getIdTrabajo() + " - " + 
+            this.displayText = "Trabajo #" + trabajo.getIdTrabajo() + " - " +
                               (trabajo.getVehiculo() != null ? trabajo.getVehiculo().getPlaca() : "Sin vehículo");
         }
 
@@ -178,8 +197,21 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         public String toString() {
             return displayText;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            TrabajoCombo that = (TrabajoCombo) obj;
+            return Objects.equals(id, that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
     }
-    
+
     // Clase interna para manejar el combo de lotes
     public static class LoteCombo {
         private final Integer id;
@@ -191,7 +223,8 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
             this.lote = lote;
             this.id = lote.getId();
             this.stock = lote.getCantidadDisponible();
-            String repuestoInfo = lote.getIdrepuesto() != null ? lote.getIdrepuesto().toString() : "Sin repuesto";
+            String repuestoInfo = lote.getIdrepuesto() != null ?
+                    "Repuesto: " + lote.getIdrepuesto().getNombre()  : "Sin repuesto";
             this.displayText = "Lote #" + lote.getId() + " - " + repuestoInfo + " (Disp: " + lote.getCantidadDisponible() + ")";
         }
 
@@ -211,6 +244,19 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         public String toString() {
             return displayText;
         }
+        
+         @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            LoteCombo that = (LoteCombo) obj;
+            return Objects.equals(id, that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
     }
 
     public void setTrabajoSelectionListener(ActionListener listener) {
@@ -220,37 +266,37 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     }
 
     public void cargarTrabajos(List<Trabajo> trabajos) {
-        if (cbTrabajos != null) {
+       if (cbTrabajos != null) {
             DefaultComboBoxModel<TrabajoCombo> model = new DefaultComboBoxModel<>();
-            
+
             // Opción por defecto
             model.addElement(new TrabajoCombo(new Trabajo() {
                 {
                     setIdTrabajo(-1);
                 }
-                
+
                 @Override
                 public String toString() {
                     return "-- Seleccione un trabajo --";
                 }
             }));
-            
+
             if (trabajos != null) {
                 for (Trabajo trabajo : trabajos) {
                     model.addElement(new TrabajoCombo(trabajo));
                 }
             }
-            
+
             // Actualización segura en el hilo de eventos
             SwingUtilities.invokeLater(() -> {
                 cbTrabajos.setModel(model);
                 System.out.println("[DEBUG] ComboBox de trabajos actualizado con " + model.getSize() + " elementos");
-                
+
                 // Seleccionar el primer elemento si existe
                 if (model.getSize() > 1) {
                     cbTrabajos.setSelectedIndex(0); // Seleccionar la opción por defecto
                 }
-                
+
                 cbTrabajos.revalidate();
                 cbTrabajos.repaint();
             });
@@ -260,13 +306,13 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     public Trabajo getTrabajoSeleccionado() {
         if (cbTrabajos != null && cbTrabajos.getSelectedItem() instanceof TrabajoCombo) {
             TrabajoCombo seleccionado = (TrabajoCombo) cbTrabajos.getSelectedItem();
-            if (seleccionado.getId() != -1) { // No es la opción por defecto
+             if (seleccionado.getId() != -1) { // No es la opción por defecto
                 return seleccionado.getTrabajo();
             }
         }
         return null;
     }
-
+    
     public void setBuscarLoteListener(ActionListener listener) {
         if (btnBuscarLote != null && listener != null) {
             // Eliminar listeners anteriores para evitar duplicados
@@ -275,9 +321,6 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
             }
 
             btnBuscarLote.addActionListener(listener);
-
-            // También responder a Enter en el campo de texto
-            txtLote.addActionListener(listener);
         }
     }
 
@@ -288,7 +331,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
     public String getNumeroLote() {
         return txtLote != null ? txtLote.getText().trim() : "";
     }
-    
+
     // Métodos para interactuar con el controlador
     public void setLoteSelectionListener(ActionListener listener) {
         if (cbLotes != null && listener != null) {
@@ -300,7 +343,7 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         if (cbLotes != null) {
             DefaultComboBoxModel<LoteCombo> model = new DefaultComboBoxModel<>();
             
-            // Opción por defecto
+             // Opción por defecto
             model.addElement(new LoteCombo(new Lote() {
                 {
                     setId(-1);
@@ -312,19 +355,19 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
                     return "-- Seleccione un lote --";
                 }
             }));
-            
+
             if (lotes != null) {
                 for (Lote lote : lotes) {
                     model.addElement(new LoteCombo(lote));
                 }
             }
             
-            // Actualización segura en el hilo de eventos
+             // Actualización segura en el hilo de eventos
             SwingUtilities.invokeLater(() -> {
                 cbLotes.setModel(model);
                 System.out.println("[DEBUG] ComboBox de lotes actualizado con " + model.getSize() + " elementos");
                 
-                // Seleccionar el primer elemento si existe
+                 // Seleccionar el primer elemento si existe
                 if (model.getSize() > 1) {
                     cbLotes.setSelectedIndex(0); // Seleccionar la opción por defecto
                 }
@@ -334,8 +377,10 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
             });
         }
     }
-
-  
+    
+     public void actualizarListaLotes(List<Lote> lotes) {
+        this.listaLotes = lotes;
+    }
 
     public void setEliminarListener(ActionListener listener) {
         if (btnEliminar != null && listener != null) {
@@ -357,12 +402,12 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         }
     }
 
-    public Lote getLoteSeleccionado() {
+   public Lote getLoteSeleccionado() {
         if (cbLotes != null && cbLotes.getSelectedItem() instanceof LoteCombo) {
             LoteCombo seleccionado = (LoteCombo) cbLotes.getSelectedItem();
-            if (seleccionado.getId() != -1) { // No es la opción por defecto
-                return seleccionado.getLote();
-            }
+             if (seleccionado.getId() != -1) { // No es la opción por defecto
+                 return seleccionado.getLote();
+             }
         }
         return null;
     }
@@ -386,6 +431,12 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         if (txtCantidad != null) txtCantidad.setText("");
         if (txtLote != null) txtLote.setText("");
         setStockDisponible(0);
+        if (cbLotes != null) {
+             DefaultComboBoxModel<LoteCombo> model = (DefaultComboBoxModel<LoteCombo>) cbLotes.getModel();
+             if(model.getSize() > 0){
+                 cbLotes.setSelectedIndex(0);
+             }
+        }
     }
 
     public void setGuardarListener(ActionListener listener) {
@@ -422,5 +473,97 @@ public class PanelDetalleTrabajoRepuesto extends JPanel {
         }
         return true;
     }
+
+    // Modelo de tabla para mostrar los detalles del trabajo-repuesto
+   private static class DetalleTableModel extends AbstractTableModel {
+        private final List<DetalleTrabajoRepuesto> detalles;
+        private final String[] columnNames = {"ID Detalle", "Trabajo", "Lote", "Repuesto", "Cantidad Usada"};
+
+        public DetalleTableModel(List<DetalleTrabajoRepuesto> detalles) {
+            this.detalles = detalles != null ? detalles : new ArrayList<>(); // Evitar nulos
+        }
+
+        @Override
+        public int getRowCount() {
+            return detalles.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return columnNames[column];
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (rowIndex < 0 || rowIndex >= detalles.size()) {
+                return null; // Manejar índice fuera de rango
+            }
+            DetalleTrabajoRepuesto detalle = detalles.get(rowIndex);
+            switch (columnIndex) {
+                case 0: return detalle.getIdDetalle();
+                case 1: return detalle.getTrabajo() != null ? detalle.getTrabajo().getIdTrabajo() : "N/A";
+                case 2: return detalle.getLote() != null ? detalle.getLote().getId() : "N/A";
+                case 3:
+                    if (detalle.getLote() != null && detalle.getLote().getIdrepuesto() != null) {
+                        return detalle.getLote().getIdrepuesto().getNombre();
+                    } else {
+                        return "N/A";
+                    }
+                case 4: return detalle.getCantidadUsada();
+                default: return null;
+            }
+        }
+
+        public DetalleTrabajoRepuesto getDetalleAt(int row) {
+            if (row < 0 || row >= detalles.size()) {
+                return null; // Manejar índice fuera de rango
+            }
+            return detalles.get(row);
+        }
+    }
     
+    public void cargarLotesFiltrados(List<Lote> lotesFiltrados) {
+        if (cbLotes != null) {
+            DefaultComboBoxModel<LoteCombo> model = new DefaultComboBoxModel<>();
+            
+             // Opción por defecto
+            model.addElement(new LoteCombo(new Lote() {
+                {
+                    setId(-1);
+                    setCantidadDisponible(0);
+                }
+                
+                @Override
+                public String toString() {
+                    return "-- Seleccione un lote --";
+                }
+            }));
+
+            if (lotesFiltrados != null) {
+                for (Lote lote : lotesFiltrados) {
+                    model.addElement(new LoteCombo(lote));
+                }
+            }
+            
+             // Actualización segura en el hilo de eventos
+            SwingUtilities.invokeLater(() -> {
+                cbLotes.setModel(model);
+                System.out.println("[DEBUG] ComboBox de lotes actualizado con " + model.getSize() + " elementos");
+                
+                 // Seleccionar el primer elemento si existe
+                if (model.getSize() > 1) {
+                    cbLotes.setSelectedIndex(0); // Seleccionar la opción por defecto
+                }
+                
+                cbLotes.revalidate();
+                cbLotes.repaint();
+            });
+        }
+    }
 }
+

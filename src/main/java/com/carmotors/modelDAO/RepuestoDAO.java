@@ -2,6 +2,7 @@ package com.carmotors.modelDAO;
 
 import com.carmotors.model.Repuesto;
 import com.carmotors.model.enums.TipoRepuesto;
+import com.carmotors.util.Conexion;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -11,28 +12,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class RepuestoDAO implements CrudDAO<Repuesto> {
-    private final HikariDataSource dataSource;
 
     public RepuestoDAO() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/carmotors");
-        config.setUsername("root");
-        config.setPassword("root");
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        config.setMaximumPoolSize(10);
-        config.setConnectionTimeout(5000);
-        config.setIdleTimeout(600000);
-
-        this.dataSource = new HikariDataSource(config);
     }
 
     @Override
     public boolean agregar(Repuesto repuesto) {
-        String sql = "INSERT INTO repuesto (nombre_repuesto, tipo_repuesto, marca, modelo_compatible, vida_util_estimada, precio) VALUES (?,?,?,?,?,?)";
+        String sql = "insert into repuesto (nombre_repuesto, tipo_repuesto, marca, modelo_compatible, vida_util_estimada, precio) values (?,?,?,?,?,?)";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setString(1, repuesto.getNombre());
             pstmt.setString(2, repuesto.getTipo().name());
@@ -44,7 +34,6 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
             } else {
                 pstmt.setNull(5, Types.DATE);
             }
-
             pstmt.setDouble(6, repuesto.getPrecio());
 
             return pstmt.executeUpdate() > 0;
@@ -54,14 +43,13 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
         }
     }
 
-
     public Repuesto[] obtenerTodos() {
         List<Repuesto> repuestos = new ArrayList<>();
         String sql = "SELECT * FROM repuesto";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 repuestos.add(mapearRepuesto(rs));
@@ -72,12 +60,11 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
         return repuestos.toArray(new Repuesto[0]);
     }
 
-
     public Repuesto buscarPorId(Integer id) {
         String sql = "SELECT * FROM repuesto WHERE id_repuesto = ?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
 
@@ -92,12 +79,11 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
         return null;
     }
 
-
     public String eliminarPorId(Integer id) {
         String sql = "DELETE FROM repuesto WHERE id_repuesto = ?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             int affectedRows = pstmt.executeUpdate();
@@ -132,8 +118,8 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
     public boolean actualizar(Repuesto repuesto) {
         String sql = "UPDATE repuesto SET nombre_repuesto=?, tipo_repuesto=?, marca=?, modelo_compatible=?, vida_util_estimada=?, precio=? WHERE id_repuesto=?";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion().getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
 
             pstmt.setString(1, repuesto.getNombre());
             pstmt.setString(2, repuesto.getTipo().name());
@@ -157,4 +143,3 @@ public class RepuestoDAO implements CrudDAO<Repuesto> {
     }
 
 }
-
