@@ -36,8 +36,6 @@ public class VentanaPrincipal extends JFrame {
 
     private PanelActividadEspecial panelActividadEspecial;
 
-    private PanelClienteActividad panelClienteActividad;
-
     private PanelEvaluacionProveedor panelEvaluacionProveedor;
 
     private PanelGestionProveedores panelGestionProveedores;
@@ -86,7 +84,6 @@ public class VentanaPrincipal extends JFrame {
         panelTrabajo = new PanelTrabajo();
         panelDetalleTrabajo = new PanelDetalleTrabajoRepuesto(); // Nuevo panel inicializado
         panelActividadEspecial = new PanelActividadEspecial();
-        panelClienteActividad = new PanelClienteActividad();
         panelEvaluacionProveedor = new PanelEvaluacionProveedor();
         panelGestionProveedores = new PanelGestionProveedores();
 
@@ -99,7 +96,6 @@ public class VentanaPrincipal extends JFrame {
         panelDerecho.add(panelTrabajo, "Trabajos");
         panelDerecho.add(panelDetalleTrabajo, "DetallesTrabajo"); // Nuevo panel agregado
         panelDerecho.add(panelActividadEspecial, "Actividades Especiales");
-        panelDerecho.add(panelClienteActividad, "Cliente Actividad");
 
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelIzquierdo, panelDerecho);
@@ -131,7 +127,7 @@ public class VentanaPrincipal extends JFrame {
         // Nuevo controlador para el panel de detalles
         new DetalleTrabajoRepuestoController(panelDetalleTrabajo, detalleTrabajoDAO, loteDao, trabajoDAO);
         new ActividadEspecialController(panelActividadEspecial, actividadEspecialDAO);
-        new ClienteActividadController(panelClienteActividad, clienteActividadDAO);
+        new ClienteActividadController(panelActividadEspecial, clienteActividadDAO);
         new EvaluacionProveedorController(panelGestionProveedores, evaluacionProveedorDAO, proveedorDao);
     }
 
